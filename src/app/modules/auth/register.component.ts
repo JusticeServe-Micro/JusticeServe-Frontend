@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-// import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -197,7 +197,7 @@ export class RegisterComponent {
   error = '';
   success = '';
 
-//   constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router) {}
 
   onSubmit(): void {
     if (!this.form.name.trim())      { this.error = 'Full name is required.'; return; }
@@ -207,15 +207,15 @@ export class RegisterComponent {
 
     this.loading = true;
     this.error = '';
-    // this.auth.register(this.form as any).subscribe({
-    //   next: () => {
-    //     this.success = 'Account created successfully! Redirecting...';
-    //     setTimeout(() => this.router.navigate(['/dashboard']), 1200);
-    //   },
-    //   error: (e) => {
-    //     this.error = e.error?.message || 'Registration failed. Please try again.';
-    //     this.loading = false;
-    //   }
-    // });
+    this.auth.register(this.form as any).subscribe({
+      next: () => {
+        this.success = 'Account created successfully! Redirecting...';
+        setTimeout(() => this.router.navigate(['/dashboard']), 1200);
+      },
+      error: (e) => {
+        this.error = e.error?.message || 'Registration failed. Please try again.';
+        this.loading = false;
+      }
+    });
   }
 }
