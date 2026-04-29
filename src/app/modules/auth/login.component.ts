@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-// import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -166,17 +166,17 @@ export class LoginComponent {
   loading = false;
   error = '';
 
-//   constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router) {}
 
   onSubmit(): void {
     this.loading = true;
     this.error = '';
-    // this.auth.login({ email: this.email, password: this.password }).subscribe({
-    //   next: () => this.router.navigate(['/dashboard']),
-    //   error: (e) => {
-    //     this.error = e.error?.message || 'Invalid credentials';
-    //     this.loading = false;
-    //   }
-    // });
+    this.auth.login({ email: this.email, password: this.password }).subscribe({
+      next: () => this.router.navigate(['/dashboard']),
+      error: (e) => {
+        this.error = e.error?.message || 'Invalid credentials';
+        this.loading = false;
+      }
+    });
   }
 }
