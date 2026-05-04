@@ -1,0 +1,97 @@
+ <div class="login-wrapper">
+      
+      <div class="court-animations">
+        <i class="bi bi-balance-scale pos-1"></i>
+        <div class="pos-2">⚖️</div>
+        <i class="bi bi-gavel pos-3"></i>
+        
+        <div class="pos-4">👨‍⚖️</div>
+        <i class="bi bi-building pos-5"></i>
+        <i class="bi bi-shield-lock pos-6"></i>
+        
+        <div class="pos-7">👮‍♂️</div>
+        <i class="bi bi-handcuffs pos-8"></i>
+        <i class="bi bi-journal-text pos-9"></i>
+        
+        <div class="pos-10">📜</div>
+        <i class="bi bi-people pos-11"></i>
+        <div class="pos-12">👩‍💼</div>
+        
+        <i class="bi bi-clipboard-check pos-13"></i>
+        <div class="pos-14">🔍</div>
+        <div class="pos-15">📝</div>
+      </div>
+
+      <div class="container login-container">
+        <div class="row justify-content-center">
+          <div class="col-md-5">
+            <div class="text-center mb-4 header-fade">
+              <i class="bi bi-balance-scale text-warning logo-glow"></i>
+              <h2 class="text-white mt-2 fw-bold">JusticeServe</h2>
+              <p class="text-white-50 small">Legal Case & Court Management System</p>
+            </div>
+            
+            <div class="card login-card shadow-lg">
+              <div class="card-body p-4">
+                <h5 class="fw-bold mb-1">Create Account</h5>
+                <p class="text-muted small mb-4">
+                  Default role: <strong>Citizen</strong>.
+                </p>
+
+                <div *ngIf="error"   class="alert alert-danger py-2 small">{{ error }}</div>
+                <div *ngIf="success" class="alert alert-success py-2 small">{{ success }}</div>
+
+                <form (ngSubmit)="onSubmit()">
+                  <div class="row g-3">
+                    <div class="col-12">
+                      <label class="form-label small fw-bold">Full Name</label>
+                      <input type="text" class="form-control" [(ngModel)]="form.name"
+                             name="name" required placeholder="e.g. Rahul Sharma">
+                    </div>
+
+                    <div class="col-12">
+                      <label class="form-label small fw-bold">Email Address</label>
+                      <input type="email" class="form-control" [(ngModel)]="form.email"
+                             name="email" required placeholder="email@example.com">
+                    </div>
+
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold">Password</label>
+                      <input type="password" class="form-control" [(ngModel)]="form.password"
+                             name="password" required placeholder="Min 6 chars">
+                    </div>
+
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold">Phone</label>
+                      <input type="text" class="form-control" [(ngModel)]="form.phone"
+                             name="phone" placeholder="+91 999...">
+                    </div>
+
+                    <div class="col-12">
+                      <div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-0 border-0 shadow-sm" style="background: rgba(13, 202, 240, 0.1);">
+                        <i class="bi bi-info-circle-fill text-info"></i>
+                        <div style="font-size: 0.75rem;">
+                          Lawyers or Judges must contact Admin for role upgrades after signup.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <button type="submit" class="btn btn-primary w-100 py-2 shadow-sm" [disabled]="loading">
+                        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                        {{ loading ? 'Creating Account...' : 'Create Account' }}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+
+                <p class="text-center mt-3 mb-0 text-muted" style="font-size:0.88rem">
+                  Already have an account? <a routerLink="/auth/login" class="text-primary fw-bold">Sign In</a>
+                </p>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
