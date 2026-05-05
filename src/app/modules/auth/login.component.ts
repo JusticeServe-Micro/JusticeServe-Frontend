@@ -1,3 +1,75 @@
+// import { Component } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { FormsModule } from '@angular/forms';
+// import { Router, RouterLink } from '@angular/router';
+// import { AuthService } from '../../core/services/auth.service';
+
+// @Component({
+//   selector: 'app-login',
+//   standalone: true,
+//   imports: [CommonModule, FormsModule, RouterLink],
+//   template: `
+//     <div class="min-vh-100 d-flex align-items-center justify-content-center"
+//          style="background: linear-gradient(135deg, #1a3a5c 0%, #2e6da4 100%)">
+//       <div class="container">
+//         <div class="row justify-content-center">
+//           <div class="col-md-5">
+//             <div class="text-center mb-4">
+//               <i class="bi bi-balance-scale text-warning" style="font-size:3rem"></i>
+//               <h2 class="text-white mt-2 fw-bold">JusticeServe</h2>
+//               <p class="text-white-50">Legal Case Management System</p>
+//             </div>
+//             <div class="card">
+//               <div class="card-body p-4">
+//                 <h5 class="fw-bold mb-4">Sign In</h5>
+//                 <div *ngIf="error" class="alert alert-danger py-2">{{ error }}</div>
+//                 <form (ngSubmit)="onSubmit()" #f="ngForm">
+//                   <div class="mb-3">
+//                     <label class="form-label">Email Address</label>
+//                     <input type="email" class="form-control" [(ngModel)]="email" name="email" required
+//                            placeholder="admin@justiceserve.com">
+//                   </div>
+//                   <div class="mb-4">
+//                     <label class="form-label">Password</label>
+//                     <input type="password" class="form-control" [(ngModel)]="password" name="password" required
+//                            placeholder="••••••••">
+//                   </div>
+//                   <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
+//                     <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+//                     {{ loading ? 'Signing in...' : 'Sign In' }}
+//                   </button>
+//                 </form>
+//                 <p class="text-center mt-3 mb-0 text-muted" style="font-size:0.88rem">
+//                   Don't have an account? <a routerLink="/auth/register">Register</a>
+//                 </p>
+//               </div>
+//             </div>
+//             <p class="text-center text-white-50 mt-3" style="font-size:0.8rem">
+//               Demo: admin&#64;justiceserve.com / admin123
+//             </p>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   `
+// })
+// export class LoginComponent {
+//   email = '';
+//   password = '';
+//   loading = false;
+//   error = '';
+
+//   constructor(private auth: AuthService, private router: Router) {}
+
+//   onSubmit(): void {
+//     this.loading = true;
+//     this.error = '';
+//     this.auth.login({ email: this.email, password: this.password }).subscribe({
+//       next: () => this.router.navigate(['/dashboard']),
+//       error: (e) => { this.error = e.error?.message || 'Invalid credentials'; this.loading = false; }
+//     });
+//   }
+// }
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,7 +80,73 @@ import { AuthService } from '../../core/services/auth.service';
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: "./login.html",
+  template: `
+    <div class="login-wrapper">
+      
+      <div class="court-animations">
+        <i class="bi bi-balance-scale pos-1"></i>
+        <div class="pos-2">⚖️</div>
+        <i class="bi bi-gavel pos-3"></i>
+        
+        <div class="pos-4">👨‍⚖️</div>
+        <i class="bi bi-building pos-5"></i>
+        <i class="bi bi-shield-lock pos-6"></i>
+        
+        <div class="pos-7">👮‍♂️</div>
+        <i class="bi bi-handcuffs pos-8"></i>
+        <i class="bi bi-journal-text pos-9"></i>
+        
+        <div class="pos-10">📜</div>
+        <i class="bi bi-people pos-11"></i>
+        <div class="pos-12">👩‍💼</div>
+        
+        <i class="bi bi-clipboard-check pos-13"></i>
+        <div class="pos-14">🔍</div>
+        <div class="pos-15">📝</div>
+      </div>
+
+      <div class="container login-container">
+        <div class="row justify-content-center">
+          <div class="col-md-5">
+            <div class="text-center mb-4 header-fade">
+              <i class="bi bi-balance-scale text-warning logo-glow"></i>
+              <h2 class="text-white mt-2 fw-bold">JusticeServe</h2>
+              <p class="text-white-50">Legal Case Management System</p>
+            </div>
+            
+            <div class="card login-card shadow-lg">
+              <div class="card-body p-4">
+                <h5 class="fw-bold mb-4">Sign In</h5>
+                <div *ngIf="error" class="alert alert-danger py-2">{{ error }}</div>
+                
+                <form (ngSubmit)="onSubmit()">
+                  <div class="mb-3">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-control" [(ngModel)]="email" name="email" required
+                           placeholder="admin@justiceserve.com">
+                  </div>
+                  <div class="mb-4">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" [(ngModel)]="password" name="password" required
+                           placeholder="••••••••">
+                  </div>
+                  <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ loading ? 'Signing in...' : 'Sign In' }}
+                  </button>
+                </form>
+                
+                <p class="text-center mt-3 mb-0 text-muted" style="font-size:0.88rem">
+                  Don't have an account? <a routerLink="/auth/register" class="text-primary fw-bold">Register</a>
+                </p>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
   styles: [`
     .login-wrapper {
       min-height: 100vh;

@@ -1,4 +1,4 @@
- <div class="page-header d-flex align-items-center justify-content-between">
+<div class="page-header d-flex align-items-center justify-content-between">
       <div>
         <h4><i class="bi bi-grid me-2"></i>Dashboard</h4>
         <p class="text-muted mb-0" style="font-size:0.85rem">
@@ -34,7 +34,7 @@
                 </div>
                 <i class="bi bi-activity" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
-              
+              <a routerLink="/cases" [queryParams]="{ status: 'ACTIVE' }" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View active cases →</a>
             </div>
           </div>
           <div class="col-sm-6 col-md-4">
@@ -46,6 +46,7 @@
                 </div>
                 <i class="bi bi-check-circle" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/cases" [queryParams]="{ status: 'CLOSED' }" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View closed cases →</a>
             </div>
           </div>
         </div>
@@ -106,6 +107,7 @@
                 <div><div style="font-size:0.8rem;opacity:0.8">Pending Judgments</div><div style="font-size:2rem;font-weight:700">{{ stats.pendingJudgments }}</div></div>
                 <i class="bi bi-hammer" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/judgments" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View pending judgments →</a>
             </div>
           </div>
           <div class="col-sm-6 col-md-3">
@@ -114,6 +116,7 @@
                 <div><div style="font-size:0.8rem;opacity:0.8">Total Cases</div><div style="font-size:2rem;font-weight:700">{{ stats.totalCases }}</div></div>
                 <i class="bi bi-folder2-open" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/cases" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View all cases →</a>
             </div>
           </div>
           <div class="col-sm-6 col-md-3">
@@ -122,6 +125,7 @@
                 <div><div style="font-size:0.8rem;opacity:0.8">Finalized</div><div style="font-size:2rem;font-weight:700">{{ stats.finalizedJudgments }}</div></div>
                 <i class="bi bi-check-circle" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/judgments" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View finalized →</a>
             </div>
           </div>
         </div>
@@ -173,6 +177,7 @@
                 <div><div style="font-size:0.8rem;opacity:0.8">Total Cases</div><div style="font-size:2rem;font-weight:700">{{ stats.totalCases }}</div></div>
                 <i class="bi bi-folder2-open" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/cases" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View all cases →</a>
             </div>
           </div>
           <div class="col-sm-6 col-md-3">
@@ -181,6 +186,7 @@
                 <div><div style="font-size:0.8rem;opacity:0.8">Scheduled Hearings</div><div style="font-size:2rem;font-weight:700">{{ stats.scheduledHearings }}</div></div>
                 <i class="bi bi-calendar-event" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/hearings" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View hearings →</a>
             </div>
           </div>
           <div class="col-sm-6 col-md-3">
@@ -189,6 +195,7 @@
                 <div><div style="font-size:0.8rem;opacity:0.8">Citizens</div><div style="font-size:2rem;font-weight:700">{{ stats.totalCitizens }}</div></div>
                 <i class="bi bi-people" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/citizens" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View citizens →</a>
             </div>
           </div>
           <div class="col-sm-6 col-md-3">
@@ -197,6 +204,7 @@
                 <div><div style="font-size:0.8rem;opacity:0.8">Under Review</div><div style="font-size:2rem;font-weight:700">{{ stats.underReview }}</div></div>
                 <i class="bi bi-hourglass-split" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/cases" [queryParams]="{ status: 'UNDER_REVIEW' }" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View under review →</a>
             </div>
           </div>
         </div>
@@ -257,6 +265,7 @@
                 <div><div style="font-size:0.8rem;opacity:0.8">Active Cases</div><div style="font-size:2rem;font-weight:700">{{ stats.myActiveCases }}</div></div>
                 <i class="bi bi-activity" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/cases" [queryParams]="{ status: 'ACTIVE' }" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View active cases →</a>
             </div>
           </div>
           <div class="col-sm-6 col-md-4">
@@ -265,6 +274,7 @@
                 <div><div style="font-size:0.8rem;opacity:0.8">Upcoming Hearings</div><div style="font-size:2rem;font-weight:700">{{ stats.totalHearings }}</div></div>
                 <i class="bi bi-calendar-event" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/hearings" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View hearings →</a>
             </div>
           </div>
         </div>
@@ -321,6 +331,7 @@
                 <div><div style="font-size:0.8rem;opacity:0.8">Total Hearings</div><div style="font-size:2rem;font-weight:700">{{ stats.totalHearings }}</div></div>
                 <i class="bi bi-calendar-event" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/hearings" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View hearings →</a>
             </div>
           </div>
           <div class="col-sm-6 col-md-4">
@@ -329,6 +340,7 @@
                 <div><div style="font-size:0.8rem;opacity:0.8">Judgments</div><div style="font-size:2rem;font-weight:700">{{ stats.finalizedJudgments }}</div></div>
                 <i class="bi bi-hammer" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/judgments" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View judgments →</a>
             </div>
           </div>
         </div>
@@ -386,6 +398,7 @@
                 <div><div style="font-size:0.8rem;opacity:0.8">Active Cases</div><div style="font-size:2rem;font-weight:700">{{ stats.activeCases }}</div></div>
                 <i class="bi bi-activity" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/cases" [queryParams]="{ status: 'ACTIVE' }" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View active cases →</a>
             </div>
           </div>
           <div class="col-sm-6 col-xl-3">
@@ -394,6 +407,7 @@
                 <div><div style="font-size:0.8rem;opacity:0.8">Total Hearings</div><div style="font-size:2rem;font-weight:700">{{ stats.totalHearings }}</div></div>
                 <i class="bi bi-calendar-event" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/hearings" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View hearings →</a>
             </div>
           </div>
           <div class="col-sm-6 col-xl-3">
@@ -402,6 +416,7 @@
                 <div><div style="font-size:0.8rem;opacity:0.8">Citizens</div><div style="font-size:2rem;font-weight:700">{{ stats.totalCitizens }}</div></div>
                 <i class="bi bi-people" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/citizens" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View citizens →</a>
             </div>
           </div>
         </div>

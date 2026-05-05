@@ -160,7 +160,7 @@
               <div class="text-white text-truncate" style="font-size:0.85rem;font-weight:600">{{ userName }}</div>
               <div class="text-white-50" style="font-size:0.75rem">{{ userRole }}</div>
             </div>
-            <button class="btn btn-sm text-white-50" (click)="logout()" title="Logout">
+            <button class="btn btn-sm text-white-50 " (click)="logout()" title="Logout">
               <i class="bi bi-box-arrow-right"></i>
             </button>
           </div>
@@ -183,6 +183,9 @@
             </a>
             <span class="badge bg-primary">{{ userRole }}</span>
             <strong style="font-size:0.9rem">{{ userName }}</strong>
+            <button class="btn btn-sm btn-outline-secondary" (click)="logout()" title="Logout">
+              <i class="bi bi-box-arrow-right"></i>
+            </button>
           </div>
         </div>
 

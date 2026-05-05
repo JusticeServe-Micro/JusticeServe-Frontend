@@ -29,7 +29,8 @@ export class UserApiService {
   }
 
   updateStatus(id: number, status: string): Observable<UserResponse> {
-    return this.http.patch<UserResponse>(`${API}/users/${id}/status`, null, { params: { status } });
+    const params = new HttpParams().set('status', status);
+    return this.http.patch<UserResponse>(`${API}/users/${id}/status`, null, { params });
   }
   updateRole(id: number, role: string): Observable<UserResponse> {
     return this.http.patch<UserResponse>(`${API}/users/${id}/change-role`, { role });
@@ -49,7 +50,8 @@ export class CitizenApiService {
   addDocument(id: number, req: DocumentRequest): Observable<DocumentResponse> { return this.http.post<DocumentResponse>(`${API}/citizens/${id}/documents`, req); }
   getDocuments(id: number): Observable<DocumentResponse[]> { return this.http.get<DocumentResponse[]>(`${API}/citizens/${id}/documents`); }
   verifyDocument(citizenId: number, docId: number, status: string): Observable<DocumentResponse> {
-    return this.http.patch<DocumentResponse>(`${API}/citizens/${citizenId}/documents/${docId}/verify`, null, { params: { status } });
+    const params = new HttpParams().set('status', status);
+    return this.http.patch<DocumentResponse>(`${API}/citizens/${citizenId}/documents/${docId}/verify`, null, { params });
   }
 }
 
@@ -64,7 +66,8 @@ export class CaseApiService {
   getByLawyer(id: number): Observable<CaseResponse[]> { return this.http.get<CaseResponse[]>(`${API}/cases/lawyer/${id}`); }
   getByStatus(status: string): Observable<CaseResponse[]> { return this.http.get<CaseResponse[]>(`${API}/cases/status/${status}`); }
   updateStatus(id: number, status: string): Observable<CaseResponse> {
-    return this.http.patch<CaseResponse>(`${API}/cases/${id}/status`, null, { params: { status } });
+    const params = new HttpParams().set('status', status);
+    return this.http.patch<CaseResponse>(`${API}/cases/${id}/status`, null, { params });
   }
   assignLawyer(caseId: number, lawyerId: number): Observable<CaseResponse> {
     return this.http.patch<CaseResponse>(`${API}/cases/${caseId}/assign-lawyer`, null, { params: { lawyerId: lawyerId.toString() } });
@@ -78,7 +81,8 @@ export class CaseApiService {
   addDocument(id: number, req: DocumentRequest): Observable<DocumentResponse> { return this.http.post<DocumentResponse>(`${API}/cases/${id}/documents`, req); }
   getDocuments(id: number): Observable<DocumentResponse[]> { return this.http.get<DocumentResponse[]>(`${API}/cases/${id}/documents`); }
   verifyDocument(caseId: number, docId: number, status: string): Observable<DocumentResponse> {
-    return this.http.patch<DocumentResponse>(`${API}/cases/${caseId}/documents/${docId}/verify`, null, { params: { status } });
+    const params = new HttpParams().set('status', status);
+    return this.http.patch<DocumentResponse>(`${API}/cases/${caseId}/documents/${docId}/verify`, null, { params });
   }
 }
 
@@ -92,7 +96,8 @@ export class HearingApiService {
   getByCase(caseId: number): Observable<HearingResponse[]> { return this.http.get<HearingResponse[]>(`${API}/hearings/case/${caseId}`); }
   getByJudge(judgeId: number): Observable<HearingResponse[]> { return this.http.get<HearingResponse[]>(`${API}/hearings/judge/${judgeId}`); }
   updateStatus(id: number, status: string): Observable<HearingResponse> {
-    return this.http.patch<HearingResponse>(`${API}/hearings/${id}/status`, null, { params: { status } });
+    const params = new HttpParams().set('status', status);
+    return this.http.patch<HearingResponse>(`${API}/hearings/${id}/status`, null, { params });
   }
   addProceeding(id: number, req: ProceedingRequest): Observable<ProceedingResponse> { return this.http.post<ProceedingResponse>(`${API}/hearings/${id}/proceedings`, req); }
   getProceedings(id: number): Observable<ProceedingResponse[]> { return this.http.get<ProceedingResponse[]>(`${API}/hearings/${id}/proceedings`); }
@@ -114,7 +119,8 @@ export class JudgmentApiService {
   getOrderById(id: number): Observable<CourtOrderResponse> { return this.http.get<CourtOrderResponse>(`${API}/court-orders/${id}`); }
   getOrdersByCase(caseId: number): Observable<CourtOrderResponse[]> { return this.http.get<CourtOrderResponse[]>(`${API}/court-orders/case/${caseId}`); }
   updateOrderStatus(id: number, status: string): Observable<CourtOrderResponse> {
-    return this.http.patch<CourtOrderResponse>(`${API}/court-orders/${id}/status`, null, { params: { status } });
+    const params = new HttpParams().set('status', status);
+    return this.http.patch<CourtOrderResponse>(`${API}/court-orders/${id}/status`, null, { params });
   }
 }
 
@@ -131,7 +137,8 @@ export class ComplianceApiService {
   getAllAudits(): Observable<AuditResponse[]> { return this.http.get<AuditResponse[]>(`${API}/audits`); }
   getAuditById(id: number): Observable<AuditResponse> { return this.http.get<AuditResponse>(`${API}/audits/${id}`); }
   updateAuditStatus(id: number, status: string): Observable<AuditResponse> {
-    return this.http.patch<AuditResponse>(`${API}/audits/${id}/status`, null, { params: { status } });
+    const params = new HttpParams().set('status', status);
+    return this.http.patch<AuditResponse>(`${API}/audits/${id}/status`, null, { params });
   }
 }
 
