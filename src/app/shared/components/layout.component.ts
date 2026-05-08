@@ -154,10 +154,10 @@ import { switchMap } from 'rxjs/operators';
             <a routerLink="/audit-logs" routerLinkActive="active" class="nav-link">
               <i class="bi bi-file-text"></i> System Logs
             </a>
-            <a routerLink="/notifications" routerLinkActive="active" class="nav-link">
+            <!-- <a routerLink="/notifications" routerLinkActive="active" class="nav-link">
               <i class="bi bi-bell"></i> Notifications
               <span *ngIf="unreadCount > 0" class="badge bg-danger ms-auto">{{ unreadCount }}</span>
-            </a>
+            </a> -->
           </ng-container>
 
         </div>
@@ -184,8 +184,12 @@ import { switchMap } from 'rxjs/operators';
       <div class="main-content flex-grow-1">
         <!-- Topbar -->
         <div class="topbar d-flex align-items-center justify-content-between">
-          <div class="text-muted" style="font-size:0.85rem">
-            <i class="bi bi-clock me-1"></i>{{ currentTime | date:'EEEE, MMM d, y · h:mm a' }}
+          <div class="d-flex align-items-center bg-light px-3 py-1 rounded-pill border shadow-sm" style="font-size:0.82rem">
+            <i class="bi bi-calendar3 me-2 text-primary"></i>
+            <span class="text-secondary fw-medium">{{ currentTime | date:'EEEE, MMM d, y' }}</span>
+            <span class="mx-2 text-muted opacity-50">•</span>
+            <i class="bi bi-clock me-2 text-primary"></i>
+            <span class="text-dark fw-bold">{{ currentTime | date:'h:mm a' }}</span>
           </div>
           <div class="d-flex align-items-center gap-3">
             <a routerLink="/notifications" class="position-relative text-decoration-none text-dark">
@@ -196,6 +200,11 @@ import { switchMap } from 'rxjs/operators';
             </a>
             <span class="badge bg-primary">{{ userRole }}</span>
             <strong style="font-size:0.9rem">{{ userName }}</strong>
+            <div class="border-start ps-3 ms-1">
+              <button class="btn btn-sm btn-outline-danger py-1 d-flex align-items-center gap-1" (click)="logout()">
+                <i class="bi bi-box-arrow-right"></i> Logout
+              </button>
+            </div>
           </div>
         </div>
 

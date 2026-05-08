@@ -79,6 +79,6 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     setTimeout(() => {
       this.loading = false;
-    }, 2000);
+    }, 0);
   }
 }

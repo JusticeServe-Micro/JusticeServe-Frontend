@@ -300,7 +300,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
-import { CitizenApiService, CaseApiService } from '../../core/services/api.service';
+import { CitizenApiService, CaseApiService, UserApiService } from '../../core/services/api.service';
 import { CitizenResponse, DocumentResponse, CaseResponse } from '../../shared/models/models';
 import { AuthService } from '../../core/services/auth.service';
 
@@ -329,33 +329,38 @@ import { AuthService } from '../../core/services/auth.service';
             <div class="card">
               <div class="card-body p-4">
                 <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-                <form (ngSubmit)="registerProfile()">
+                <form #regForm="ngForm" (ngSubmit)="registerProfile(regForm)">
                   <div class="mb-3">
                     <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                    <input class="form-control" [(ngModel)]="form.name" name="name" required>
+                    <input class="form-control" [(ngModel)]="form.name" name="name" required #name="ngModel">
+                    <div *ngIf="name.invalid && name.touched" class="text-danger small">Full name is required.</div>
                   </div>
                   <div class="row g-3">
                     <div class="col-md-6">
-                      <label class="form-label">Date of Birth</label>
-                      <input type="date" class="form-control" [(ngModel)]="form.dob" name="dob">
+                      <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                      <input type="date" class="form-control" [(ngModel)]="form.dob" name="dob" required #dob="ngModel">
+                      <div *ngIf="dob.invalid && dob.touched" class="text-danger small">Date of birth is required.</div>
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label">Gender</label>
-                      <select class="form-select" [(ngModel)]="form.gender" name="gender" required>
+                      <label class="form-label">Gender <span class="text-danger">*</span></label>
+                      <select class="form-select" [(ngModel)]="form.gender" name="gender" required #gender="ngModel">
                         <option value="">Select...</option>
                         <option>Male</option><option>Female</option><option>Other</option>
                       </select>
+                      <div *ngIf="gender.invalid && gender.touched" class="text-danger small">Gender is required.</div>
                     </div>
                     <div class="col-12">
-                      <label class="form-label">Address</label>
-                      <textarea class="form-control" rows="2" [(ngModel)]="form.address" name="address" placeholder="123 Main St, City"></textarea>
+                      <label class="form-label">Address <span class="text-danger">*</span></label>
+                      <textarea class="form-control" rows="2" [(ngModel)]="form.address" name="address" placeholder="123 Main St, City" required #address="ngModel"></textarea>
+                      <div *ngIf="address.invalid && address.touched" class="text-danger small">Address is required.</div>
                     </div>
                     <div class="col-12">
-                      <label class="form-label">Contact Info</label>
-                      <input class="form-control" [(ngModel)]="form.contactInfo" name="contactInfo" placeholder="+91 9999999999">
+                      <label class="form-label">Contact Info <span class="text-danger">*</span></label>
+                      <input class="form-control" [(ngModel)]="form.contactInfo" name="contactInfo" placeholder="+91 9999999999" required #contactInfo="ngModel">
+                      <div *ngIf="contactInfo.invalid && contactInfo.touched" class="text-danger small">Contact info is required.</div>
                     </div>
                   </div>
-                  <button type="submit" class="btn btn-primary mt-4" [disabled]="saving">
+                  <button type="submit" class="btn btn-primary mt-4" [disabled]="saving || regForm.invalid">
                     <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>Save Profile
                   </button>
                 </form>
@@ -386,34 +391,39 @@ import { AuthService } from '../../core/services/auth.service';
                 </div>
                 <div class="card-body p-4">
                   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-                  <form (ngSubmit)="updateProfile()">
+                  <form #editForm="ngForm" (ngSubmit)="updateProfile(editForm)">
                     <div class="mb-3">
                       <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                      <input class="form-control" [(ngModel)]="form.name" name="name" required>
+                      <input class="form-control" [(ngModel)]="form.name" name="name" required #name="ngModel">
+                      <div *ngIf="name.invalid && name.touched" class="text-danger small">Full name is required.</div>
                     </div>
                     <div class="row g-3">
                       <div class="col-md-6">
-                        <label class="form-label">Date of Birth</label>
-                        <input type="date" class="form-control" [(ngModel)]="form.dob" name="dob">
+                        <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" [(ngModel)]="form.dob" name="dob" required #dob="ngModel">
+                        <div *ngIf="dob.invalid && dob.touched" class="text-danger small">Date of birth is required.</div>
                       </div>
                       <div class="col-md-6">
                         <label class="form-label">Gender <span class="text-danger">*</span></label>
-                        <select class="form-select" [(ngModel)]="form.gender" name="gender" required>
+                        <select class="form-select" [(ngModel)]="form.gender" name="gender" required #gender="ngModel">
                           <option value="">Select...</option>
                           <option>Male</option><option>Female</option><option>Other</option>
                         </select>
+                        <div *ngIf="gender.invalid && gender.touched" class="text-danger small">Gender is required.</div>
                       </div>
                       <div class="col-12">
-                        <label class="form-label">Address</label>
-                        <textarea class="form-control" rows="2" [(ngModel)]="form.address" name="address" placeholder="123 Main St, City"></textarea>
+                        <label class="form-label">Address <span class="text-danger">*</span></label>
+                        <textarea class="form-control" rows="2" [(ngModel)]="form.address" name="address" placeholder="123 Main St, City" required #address="ngModel"></textarea>
+                        <div *ngIf="address.invalid && address.touched" class="text-danger small">Address is required.</div>
                       </div>
                       <div class="col-12">
-                        <label class="form-label">Contact Info</label>
-                        <input class="form-control" [(ngModel)]="form.contactInfo" name="contactInfo" placeholder="+91 9999999999">
+                        <label class="form-label">Contact Info <span class="text-danger">*</span></label>
+                        <input class="form-control" [(ngModel)]="form.contactInfo" name="contactInfo" placeholder="+91 9999999999" required #contactInfo="ngModel">
+                        <div *ngIf="contactInfo.invalid && contactInfo.touched" class="text-danger small">Contact info is required.</div>
                       </div>
                     </div>
                     <div class="mt-4 d-flex gap-2">
-                      <button type="submit" class="btn btn-primary" [disabled]="saving">
+                      <button type="submit" class="btn btn-primary" [disabled]="saving || editForm.invalid">
                         <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>Save Changes
                       </button>
                       <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
@@ -442,6 +452,7 @@ import { AuthService } from '../../core/services/auth.service';
               <div class="text-start">
                 <div class="mb-2"><i class="bi bi-calendar3 me-2 text-muted"></i>{{ citizen.dob ? (citizen.dob | date:'mediumDate') : 'N/A' }}</div>
                 <div class="mb-2"><i class="bi bi-gender-ambiguous me-2 text-muted"></i>{{ citizen.gender || 'Not specified' }}</div>
+                <div class="mb-2"><i class="bi bi-envelope me-2 text-muted"></i>{{ auth.currentUser?.email || 'N/A' }}</div>
                 <div class="mb-2"><i class="bi bi-telephone me-2 text-muted"></i>{{ citizen.contactInfo || 'N/A' }}</div>
                 <div><i class="bi bi-geo-alt me-2 text-muted"></i>{{ citizen.address || 'N/A' }}</div>
               </div>
@@ -598,6 +609,7 @@ export class MyProfileComponent implements OnInit {
     public auth: AuthService,
     private citizenApi: CitizenApiService,
     private caseApi: CaseApiService,
+    private userApi: UserApiService,
     private router: Router
   ) {}
 
@@ -606,6 +618,16 @@ export class MyProfileComponent implements OnInit {
     if (!userId) { this.loading = false; return; }
     this.form.userId = userId;
     this.form.name = this.auth.currentUser?.name ?? '';
+
+    // Fetch user details to get phone
+    this.userApi.getById(userId).subscribe({
+      next: user => {
+        this.form.contactInfo = user.phone ?? '';
+      },
+      error: () => {
+        this.form.contactInfo = '';
+      }
+    });
 
     this.citizenApi.getByUserId(userId).subscribe({
       next: c => {
@@ -639,7 +661,8 @@ export class MyProfileComponent implements OnInit {
     if (this.citizen) this.populateForm(this.citizen);
   }
 
-  updateProfile(): void {
+  updateProfile(form?: any): void {
+    if (form && form.invalid) return;
     if (!this.citizen) return;
     this.saving = true; this.error = '';
     this.citizenApi.update(this.citizen.citizenId, this.form as any).subscribe({
@@ -657,7 +680,8 @@ export class MyProfileComponent implements OnInit {
     this.caseApi.getByCitizen(citizenId).subscribe(c => this.cases = c);
   }
 
-  registerProfile(): void {
+  registerProfile(form?: any): void {
+    if (form && form.invalid) return;
     this.saving = true; this.error = '';
     this.citizenApi.create(this.form as any).subscribe({
       next: c => {

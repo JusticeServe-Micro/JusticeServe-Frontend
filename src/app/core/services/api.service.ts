@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, catchError, of } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   UserResponse, CitizenRequest, CitizenResponse, DocumentRequest, DocumentResponse,
@@ -45,7 +45,17 @@ export class CitizenApiService {
   create(req: CitizenRequest): Observable<CitizenResponse> { return this.http.post<CitizenResponse>(`${API}/citizens`, req); }
   getAll(): Observable<CitizenResponse[]> { return this.http.get<CitizenResponse[]>(`${API}/citizens`); }
   getById(id: number): Observable<CitizenResponse> { return this.http.get<CitizenResponse>(`${API}/citizens/${id}`); }
-  getByUserId(userId: number): Observable<CitizenResponse> { return this.http.get<CitizenResponse>(`${API}/citizens/user/${userId}`); }
+  getByUserId(userId: number): Observable<CitizenResponse> {
+    return this.http.get<CitizenResponse[]>(`${API}/citizens`).pipe(
+      map(citizens => {
+        const matched = citizens.find(c => c.userId === userId);
+        if (!matched) {
+          throw new Error('Citizen profile not found for current user');
+        }
+        return matched;
+      })
+    );
+  }
   update(id: number, req: CitizenRequest): Observable<CitizenResponse> { return this.http.put<CitizenResponse>(`${API}/citizens/${id}`, req); }
   addDocument(id: number, req: DocumentRequest): Observable<DocumentResponse> { return this.http.post<DocumentResponse>(`${API}/citizens/${id}/documents`, req); }
   getDocuments(id: number): Observable<DocumentResponse[]> { return this.http.get<DocumentResponse[]>(`${API}/citizens/${id}/documents`); }
