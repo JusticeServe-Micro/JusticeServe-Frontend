@@ -8,7 +8,7 @@ import {
   UserApiService, CitizenApiService, NotificationApiService
 } from '../../core/services/api.service';
 import {
-  CaseResponse, DocumentResponse, HearingResponse,
+  CaseResponse, CourtOrderResponse, DocumentResponse, HearingResponse,
   JudgmentResponse, ProceedingResponse, UserResponse
 } from '../../shared/models/models';
 import { AuthService } from '../../core/services/auth.service';
@@ -23,9 +23,14 @@ import { AuthService } from '../../core/services/auth.service';
         <h4><i class="bi bi-folder2-open me-2"></i>Case Details</h4>
         <small class="text-muted">Case #{{ caseId }}</small>
       </div>
-      <a routerLink="/cases" class="btn btn-outline-secondary btn-sm">
-        <i class="bi bi-arrow-left me-1"></i>Back to Cases
-      </a>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-success btn-sm" (click)="downloadCasePDF()">
+          <i class="bi bi-download me-1"></i>Download PDF
+        </button>
+        <a routerLink="/cases" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-arrow-left me-1"></i>Back to Cases
+        </a>
+      </div>
     </div>
 
     <div *ngIf="loading" class="text-center py-5">
@@ -513,11 +518,11 @@ import { AuthService } from '../../core/services/auth.service';
       <!-- Judgments -->
       <div class="card mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <span><i class="bi bi-hammer me-2"></i>Judgments & Court Orders
+          <span><i class="bi bi-hammer me-2"></i>Judgments
             <span class="badge bg-secondary ms-1">{{ judgments.length }}</span>
           </span>
           <a *ngIf="isJudge || isAdmin" [routerLink]="['/judgments/new']"
-             [queryParams]="{caseId: caseId}" class="btn btn-sm btn-outline-warning">
+             [queryParams]="{caseId: caseId}" class="btn btn-sm btn-outline-warning shadow-sm">
             <i class="bi bi-plus me-1"></i>Record Judgment
           </a>
         </div>
@@ -545,6 +550,39 @@ import { AuthService } from '../../core/services/auth.service';
               <tr *ngIf="judgments.length === 0">
                 <td [attr.colspan]="(isJudge || isAdmin) ? 5 : 4" class="text-center text-muted py-3">
                   <i class="bi bi-hammer me-2"></i>No judgments recorded yet
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Court Orders -->
+      <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-file-text me-2"></i>Court Orders
+            <span class="badge bg-secondary ms-1">{{ orders.length }}</span>
+          </span>
+          <a *ngIf="isJudge || isAdmin" [routerLink]="['/judgments/orders/new']"
+             [queryParams]="{caseId: caseId}" class="btn btn-sm btn-outline-info shadow-sm">
+            <i class="bi bi-plus me-1"></i>Issue Order
+          </a>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+              <tr><th>#</th><th>Description</th><th>Date</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let o of orders">
+                <td>#{{ o.orderId }}</td>
+                <td class="text-truncate" style="max-width:220px">{{ o.description }}</td>
+                <td>{{ o.date | date:'mediumDate' }}</td>
+                <td><span class="badge bg-info text-dark">{{ o.status }}</span></td>
+              </tr>
+              <tr *ngIf="orders.length === 0">
+                <td colspan="4" class="text-center text-muted py-3">
+                  <i class="bi bi-file-text me-2"></i>No court orders issued yet
                 </td>
               </tr>
             </tbody>
@@ -635,6 +673,7 @@ export class CaseDetailComponent implements OnInit {
   documents: DocumentResponse[] = [];
   hearings: HearingResponse[] = [];
   judgments: JudgmentResponse[] = [];
+  orders: CourtOrderResponse[] = [];
   proceedings: ProceedingResponse[] = [];
   selectedProceeding?: ProceedingResponse;
   showProceedingModal = false;
@@ -745,6 +784,7 @@ export class CaseDetailComponent implements OnInit {
       error: () => { this.hearings = []; this.proceedings = []; }
     });
     this.judgmentApi.getByCase(this.caseId).subscribe(j => this.judgments = j, () => {});
+    this.judgmentApi.getOrdersByCase(this.caseId).subscribe(o => this.orders = o, () => {});
     if (this.canAssignLawyer || this.canAssignJudge) {
       this.userApi.getByRole('LAWYER').subscribe(d => this.lawyers = d, () => {});
       this.userApi.getByRole('JUDGE').subscribe(d => this.judges = d, () => {});
@@ -915,6 +955,9 @@ export class CaseDetailComponent implements OnInit {
         this.newStatus = c.status;  // keep select in sync
         this.updatingStatus = false;
         this.showToast(`Status updated to ${c.status}`, 'success');
+        
+        // Reload full case data to ensure judge and lawyer names are updated
+        this.loadCase();
       },
       error: (e) => {
         this.updatingStatus = false;
@@ -1141,5 +1184,289 @@ export class CaseDetailComponent implements OnInit {
         this.sendingClerkDocRequest = false;
       }
     });
+  }
+
+  downloadCasePDF(): void {
+    const htmlContent = this.generateCaseHTML();
+    this.generatePDF(htmlContent, `Case_${this.caseId}_Details.pdf`);
+  }
+
+  private generateCaseHTML(): string {
+    const caseData = this.caseData;
+    const documents = this.documents;
+    const hearings = this.hearings;
+    const judgments = this.judgments;
+    const orders = this.orders;
+    const proceedings = this.proceedings;
+
+    return `
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; text-align: center; }
+            .header h1 { margin: 0; font-size: 24px; }
+            .header p { margin: 5px 0 0 0; font-size: 12px; opacity: 0.9; }
+            .section { margin-bottom: 25px; page-break-inside: avoid; }
+            .section-title { background: #f0f0f0; padding: 10px 15px; border-left: 4px solid #667eea; font-weight: bold; margin-bottom: 15px; }
+            .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; }
+            .info-item { border: 1px solid #e0e0e0; padding: 15px; border-radius: 5px; }
+            .info-label { font-size: 11px; color: #666; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
+            .info-value { font-size: 14px; color: #333; font-weight: 600; }
+            .content-box { border: 1px solid #e0e0e0; padding: 15px; border-radius: 5px; background: #fafafa; }
+            .table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+            .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            .table th { background-color: #f2f2f2; font-weight: bold; }
+            .badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+            .badge-active { background: #28a745; color: white; }
+            .badge-closed { background: #6c757d; color: white; }
+            .badge-under_review { background: #ffc107; color: #333; }
+            .badge-hearing_scheduled { background: #17a2b8; color: white; }
+            .badge-judgment_pending { background: #dc3545; color: white; }
+            .badge-dismissed { background: #6c757d; color: white; }
+            .badge-filed { background: #007bff; color: white; }
+            .badge-scheduled { background: #28a745; color: white; }
+            .badge-completed { background: #17a2b8; color: white; }
+            .badge-adjourned { background: #ffc107; color: #333; }
+            .badge-cancelled { background: #dc3545; color: white; }
+            .badge-draft { background: #ffc107; color: #333; }
+            .badge-final { background: #28a745; color: white; }
+            .badge-verified { background: #28a745; color: white; }
+            .badge-rejected { background: #dc3545; color: white; }
+            .badge-pending { background: #ffc107; color: #333; }
+            .footer { margin-top: 30px; padding-top: 15px; border-top: 2px solid #ddd; font-size: 11px; color: #666; text-align: center; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>📋 CASE DETAILS REPORT</h1>
+            <p>Case ID: #${caseData.caseId} - ${caseData.title}</p>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Case Status</div>
+            <span class="badge badge-${caseData.status.toLowerCase().replace('_', '_')}">
+              ${caseData.status.replace('_', ' ')}
+            </span>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Case Information</div>
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Case ID</div>
+                <div class="info-value">#${caseData.caseId}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Title</div>
+                <div class="info-value">${caseData.title}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Filed Date</div>
+                <div class="info-value">${new Date(caseData.filedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Citizen</div>
+                <div class="info-value">${caseData.citizenName || 'N/A'}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Assigned Lawyer</div>
+                <div class="info-value">${caseData.lawyerName || 'Not Assigned'}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Assigned Judge</div>
+                <div class="info-value">${caseData.judgeName || 'Not Assigned'}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Case Description</div>
+            <div class="content-box">
+              ${caseData.description ? caseData.description.replace(/\n/g, '<br>') : 'No description provided.'}
+            </div>
+          </div>
+
+          ${documents.length > 0 ? `
+          <div class="section">
+            <div class="section-title">Documents (${documents.length})</div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>File Name</th>
+                  <th>Uploaded Date</th>
+                  <th>Verification Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${documents.map(d => `
+                  <tr>
+                    <td>${d.docType}</td>
+                    <td>${this.getFileName(d.fileUri)}</td>
+                    <td>${new Date(d.uploadedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
+                    <td><span class="badge badge-${d.verificationStatus.toLowerCase()}">${d.verificationStatus}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          ` : ''}
+
+          ${hearings.length > 0 ? `
+          <div class="section">
+            <div class="section-title">Hearings (${hearings.length})</div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Judge</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${hearings.map(h => `
+                  <tr>
+                    <td>#${h.hearingId}</td>
+                    <td>${h.judgeName}</td>
+                    <td>${new Date(h.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
+                    <td>${h.time}</td>
+                    <td><span class="badge badge-${h.status.toLowerCase()}">${h.status}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          ` : ''}
+
+          ${judgments.length > 0 ? `
+          <div class="section">
+            <div class="section-title">Judgments (${judgments.length})</div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Summary</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${judgments.map(j => `
+                  <tr>
+                    <td>#${j.judgmentId}</td>
+                    <td>${j.summary.length > 50 ? j.summary.substring(0, 50) + '...' : j.summary}</td>
+                    <td>${new Date(j.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
+                    <td><span class="badge badge-${j.status.toLowerCase()}">${j.status}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          ` : ''}
+
+          ${orders.length > 0 ? `
+          <div class="section">
+            <div class="section-title">Court Orders (${orders.length})</div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${orders.map(o => `
+                  <tr>
+                    <td>#${o.orderId}</td>
+                    <td>${o.description.length > 50 ? o.description.substring(0, 50) + '...' : o.description}</td>
+                    <td>${new Date(o.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
+                    <td><span class="badge badge-pending">${o.status}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          ` : ''}
+
+          ${proceedings.length > 0 ? `
+          <div class="section">
+            <div class="section-title">Proceedings (${proceedings.length})</div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Hearing</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${proceedings.map(p => `
+                  <tr>
+                    <td>#${p.proceedingId}</td>
+                    <td>${this.getHearingTitle(p)}</td>
+                    <td>${p.notes.length > 50 ? p.notes.substring(0, 50) + '...' : p.notes}</td>
+                    <td>${new Date(p.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          ` : ''}
+
+          <div class="footer">
+            <p>This document is generated from JusticeServe Case Management System</p>
+            <p>Generated on: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+          </div>
+        </body>
+      </html>
+    `;
+  }
+
+  private generatePDF(htmlContent: string, filename: string): void {
+    // Create a temporary div to hold the HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    document.body.appendChild(tempDiv);
+
+    // Use html2pdf-like approach with canvas
+    const element = tempDiv.querySelector('body') || tempDiv;
+    const opt = {
+      margin: 10,
+      filename: filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+    };
+
+    // Alternative: Simple PDF generation using canvas and blob
+    this.simpleHTMLToPDF(htmlContent, filename);
+
+    // Cleanup
+    document.body.removeChild(tempDiv);
+  }
+
+  private simpleHTMLToPDF(htmlContent: string, filename: string): void {
+    // Create a new window to print to PDF
+    const printWindow = window.open('', '', 'height=600,width=800');
+    if (printWindow) {
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+
+      // Wait a moment for content to load, then print
+      setTimeout(() => {
+        printWindow.print();
+        // Optional: Close after printing
+        // printWindow.close();
+      }, 100);
+    }
   }
 }
