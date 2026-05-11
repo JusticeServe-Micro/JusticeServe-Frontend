@@ -7,10 +7,12 @@ import {
   CaseApiService, HearingApiService, JudgmentApiService,
   UserApiService, CitizenApiService, NotificationApiService
 } from '../../core/services/api.service';
+
 import {
   CaseResponse, CourtOrderResponse, DocumentResponse, HearingResponse,
   JudgmentResponse, ProceedingResponse, UserResponse
 } from '../../shared/models/models';
+
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
