@@ -10,7 +10,53 @@ import { AuthService } from '../../core/services/auth.service';
   selector: 'app-hearings-list',
   standalone: true,
   imports: [CommonModule, RouterLink, FormsModule],
-  templateUrl:"./hearing-list.html"
+  template: `
+    <div class="page-header d-flex justify-content-between align-items-center">
+      <h4><i class="bi bi-calendar-event me-2"></i>Hearings</h4>
+      <a *ngIf="!isLawyer && !isAuditorOrCompliance" routerLink="/hearings/new" class="btn btn-primary"><i class="bi bi-calendar-plus me-1"></i>Schedule Hearing</a>
+    </div>
+    <div class="p-4">
+      <div class="card mb-3">
+        <div class="card-body py-2 d-flex gap-2">
+          <input class="form-control form-control-sm w-50" placeholder="Search by case..." [(ngModel)]="search">
+          <select class="form-select form-select-sm" style="width:200px" [(ngModel)]="filterStatus">
+            <option value="">All statuses</option>
+            <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body p-0">
+          <div *ngIf="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+          <div class="table-responsive" *ngIf="!loading">
+            <table class="table table-hover mb-0">
+              <thead><tr>
+                <th>ID</th><th>Case</th><th>Judge</th><th>Date</th><th>Time</th><th>Status</th><th>Actions</th>
+              </tr></thead>
+              <tbody>
+                <tr *ngFor="let h of filtered">
+                  <td>#{{ h.hearingId }}</td>
+                  <td>{{ h.caseTitle }}</td>
+                  <td>{{ h.judgeName }}</td>
+                  <td>{{ h.date | date:'mediumDate' }}</td>
+                  <td>{{ h.time }}</td>
+                  <td><span class="badge" [ngClass]="badge(h.status)">{{ h.status }}</span></td>
+                  <td>
+                    <a [routerLink]="['/hearings', h.hearingId]" class="btn btn-sm btn-outline-primary">
+                      <i class="bi bi-eye"></i>
+                    </a>
+                  </td>
+                </tr>
+                <tr *ngIf="filtered.length===0">
+                  <td colspan="7" class="text-center text-muted py-4">No hearings</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
 })
 export class HearingsListComponent implements OnInit {
   hearings: HearingResponse[] = [];
@@ -22,6 +68,7 @@ export class HearingsListComponent implements OnInit {
   constructor(private api: HearingApiService, private caseApi: CaseApiService, private auth: AuthService) {}
 
   get isLawyer(): boolean { return this.auth.hasRole('LAWYER'); }
+  get isAuditorOrCompliance(): boolean { return this.auth.hasRole('AUDITOR') || this.auth.hasRole('COMPLIANCE'); }
 
   get filtered(): HearingResponse[] {
     return this.hearings.filter(h =>
