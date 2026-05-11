@@ -121,6 +121,7 @@ export class JudgmentApiService {
   getAll(): Observable<JudgmentResponse[]> { return this.http.get<JudgmentResponse[]>(`${API}/judgments`); }
   getById(id: number): Observable<JudgmentResponse> { return this.http.get<JudgmentResponse>(`${API}/judgments/${id}`); }
   getByCase(caseId: number): Observable<JudgmentResponse[]> { return this.http.get<JudgmentResponse[]>(`${API}/judgments/case/${caseId}`); }
+  getByJudge(judgeId: number): Observable<JudgmentResponse[]> { return this.http.get<JudgmentResponse[]>(`${API}/judgments/judge/${judgeId}`); }
   finalize(id: number): Observable<JudgmentResponse> { return this.http.patch<JudgmentResponse>(`${API}/judgments/${id}/finalize`, null); }
 
   // Court Orders (same service)
@@ -128,6 +129,7 @@ export class JudgmentApiService {
   getAllOrders(): Observable<CourtOrderResponse[]> { return this.http.get<CourtOrderResponse[]>(`${API}/court-orders`); }
   getOrderById(id: number): Observable<CourtOrderResponse> { return this.http.get<CourtOrderResponse>(`${API}/court-orders/${id}`); }
   getOrdersByCase(caseId: number): Observable<CourtOrderResponse[]> { return this.http.get<CourtOrderResponse[]>(`${API}/court-orders/case/${caseId}`); }
+  getOrdersByJudge(judgeId: number): Observable<CourtOrderResponse[]> { return this.http.get<CourtOrderResponse[]>(`${API}/court-orders/judge/${judgeId}`); }
   updateOrderStatus(id: number, status: string): Observable<CourtOrderResponse> {
     const params = new HttpParams().set('status', status);
     return this.http.patch<CourtOrderResponse>(`${API}/court-orders/${id}/status`, null, { params });

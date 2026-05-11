@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { JudgmentApiService, CaseApiService, UserApiService } from '../../core/services/api.service';
 import { JudgmentResponse, CourtOrderResponse, CaseResponse, UserResponse } from '../../shared/models/models';
 import { FormsModule } from '@angular/forms';
@@ -73,11 +73,7 @@ import { AuthService } from '../../core/services/auth.service';
                     <td>{{ o.judgeName }}</td>
                     <td>{{ o.description | slice:0:50 }}...</td>
                     <td>{{ o.date | date:'mediumDate' }}</td>
-                    <td>
-                      <select class="form-select form-select-sm" style="width:120px" [ngModel]="o.status" (change)="updateOrder(o.orderId, $any($event.target).value)">
-                        <option>ACTIVE</option><option>SERVED</option><option>EXPIRED</option>
-                      </select>
-                    </td>
+                    <td><span class="badge" [ngClass]="o.status==='ACTIVE'?'bg-success':o.status==='SERVED'?'bg-info':'bg-secondary'">{{ o.status }}</span></td>
                     <td>
                       <button class="btn btn-sm btn-info" (click)="viewOrder(o)">
                         <i class="bi bi-eye"></i>
@@ -415,49 +411,99 @@ export class JudgmentsListComponent implements OnInit {
   selectedJudgment: JudgmentResponse | null = null;
   selectedOrder: CourtOrderResponse | null = null;
 
-  constructor(private api: JudgmentApiService, private caseApi: CaseApiService, private userApi: UserApiService, private router: Router, public auth: AuthService) {}
+  constructor(
+    private api: JudgmentApiService,
+    private caseApi: CaseApiService,
+    private userApi: UserApiService,
+    private route: ActivatedRoute,
+    private router: Router,
+    public auth: AuthService
+  ) {}
 
   get isAuditorOrCompliance(): boolean { return this.auth.hasRole('AUDITOR') || this.auth.hasRole('COMPLIANCE'); }
+  get isJudge(): boolean { return this.auth.hasRole('JUDGE'); }
 
   ngOnInit(): void {
-    forkJoin({
-      cases: this.caseApi.getAll(),
-      judges: this.userApi.getByRole('JUDGE'),
-      judgments: this.api.getAll(),
-      orders: this.api.getAllOrders()
-    }).subscribe({
-      next: ({ cases, judges, judgments, orders }) => {
-        this.cases = cases;
-        this.judges = judges;
-        this.judgments = judgments.map(j => ({
-          ...j,
-          caseTitle: j.caseTitle || cases.find(c => c.caseId === j.caseId)?.title || 'Unknown',
-          judgeName: j.judgeName || judges.find(u => u.userId === j.judgeId)?.name || 'Unknown'
-        }));
-        this.orders = orders.map(o => ({
-          ...o,
-          caseTitle: o.caseTitle || cases.find(c => c.caseId === o.caseId)?.title || 'Unknown',
-          judgeName: o.judgeName || judges.find(u => u.userId === o.judgeId)?.name || 'Unknown'
-        }));
-        this.loading = false;
-      },
-      error: () => this.loading = false
-    });
+    if (this.route.snapshot.routeConfig?.path === 'orders') {
+      this.tab = 'orders';
+    }
+
+    const userId = this.auth.currentUser?.userId;
+
+    if (this.isJudge && userId) {
+      // For judges, fetch all data and filter on frontend
+      forkJoin({
+        cases: this.caseApi.getAll(),
+        judges: this.userApi.getByRole('JUDGE'),
+        judgments: this.api.getAll(),
+        orders: this.api.getAllOrders()
+      }).subscribe({
+        next: ({ cases, judges, judgments, orders }) => {
+          this.cases = cases;
+          this.judges = judges;
+          this.judgments = judgments
+            .filter(j => j.judgeId === userId)
+            .map(j => ({
+              ...j,
+              caseTitle: j.caseTitle || cases.find(c => c.caseId === j.caseId)?.title || 'Unknown',
+              judgeName: j.judgeName || judges.find(u => u.userId === j.judgeId)?.name || 'Unknown'
+            }));
+          this.orders = orders
+            .filter(o => o.judgeId === userId)
+            .map(o => ({
+              ...o,
+              caseTitle: o.caseTitle || cases.find(c => c.caseId === o.caseId)?.title || 'Unknown',
+              judgeName: o.judgeName || judges.find(u => u.userId === o.judgeId)?.name || 'Unknown'
+            }));
+          this.loading = false;
+        },
+        error: () => this.loading = false
+      });
+    } else {
+      forkJoin({
+        cases: this.caseApi.getAll(),
+        judges: this.userApi.getByRole('JUDGE'),
+        judgments: this.api.getAll(),
+        orders: this.api.getAllOrders()
+      }).subscribe({
+        next: ({ cases, judges, judgments, orders }) => {
+          this.cases = cases;
+          this.judges = judges;
+          this.judgments = judgments.map(j => ({
+            ...j,
+            caseTitle: j.caseTitle || cases.find(c => c.caseId === j.caseId)?.title || 'Unknown',
+            judgeName: j.judgeName || judges.find(u => u.userId === j.judgeId)?.name || 'Unknown'
+          }));
+          this.orders = orders.map(o => ({
+            ...o,
+            caseTitle: o.caseTitle || cases.find(c => c.caseId === o.caseId)?.title || 'Unknown',
+            judgeName: o.judgeName || judges.find(u => u.userId === o.judgeId)?.name || 'Unknown'
+          }));
+          this.loading = false;
+        },
+        error: () => this.loading = false
+      });
+    }
   }
 
   loadOrders(): void {
     if (this.orders.length) return;
     this.ordersLoading = true;
-    this.api.getAllOrders().subscribe({ 
-      next: orders => { 
-        this.orders = orders.map(o => ({
+    const userId = this.auth.currentUser?.userId;
+    this.api.getAllOrders().subscribe({
+      next: orders => {
+        let filteredOrders = orders;
+        if (this.isJudge && userId) {
+          filteredOrders = orders.filter(o => o.judgeId === userId);
+        }
+        this.orders = filteredOrders.map(o => ({
           ...o,
           caseTitle: o.caseTitle || this.cases.find(c => c.caseId === o.caseId)?.title || 'Unknown',
           judgeName: o.judgeName || this.judges.find(u => u.userId === o.judgeId)?.name || 'Unknown'
         }));
-        this.ordersLoading = false; 
-      }, 
-      error: () => this.ordersLoading = false 
+        this.ordersLoading = false;
+      },
+      error: () => this.ordersLoading = false
     });
   }
 
