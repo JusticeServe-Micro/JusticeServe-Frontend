@@ -39,7 +39,7 @@ export class JudgmentFormComponent implements OnInit {
   onSubmit(): void {
     this.loading = true; this.error = '';
     this.api.record(this.form as any).subscribe({
-      next: j => { this.success = `Judgment #${j.judgmentId} recorded as DRAFT`; setTimeout(() => this.router.navigate(['/judgments']), 1200); },
+      next: j => { this.success = `Judgment #${j.judgmentId} recorded as DRAFT`; setTimeout(() => this.router.navigate(['/judgments/orders']), 1200); },
       error: e => { this.error = e.error?.message || 'Failed'; this.loading = false; }
     });
   }

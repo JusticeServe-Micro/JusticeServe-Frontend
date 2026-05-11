@@ -69,6 +69,7 @@ export class HearingsListComponent implements OnInit {
 
   get isLawyer(): boolean { return this.auth.hasRole('LAWYER'); }
   get isAuditorOrCompliance(): boolean { return this.auth.hasRole('AUDITOR') || this.auth.hasRole('COMPLIANCE'); }
+  get isJudge(): boolean { return this.auth.hasRole('JUDGE'); }
 
   get filtered(): HearingResponse[] {
     return this.hearings.filter(h =>
@@ -108,6 +109,17 @@ export class HearingsListComponent implements OnInit {
               }
             });
           });
+        },
+        error: () => this.loading = false
+      });
+    } else if (this.isJudge) {
+      // For judges, fetch all hearings and filter on frontend
+      const userId = this.auth.currentUser?.userId;
+      if (!userId) { this.loading = false; return; }
+      this.api.getAll().subscribe({
+        next: allHearings => {
+          this.hearings = allHearings.filter(h => h.judgeId === userId);
+          this.loading = false;
         },
         error: () => this.loading = false
       });
