@@ -1,4 +1,4 @@
- <div class="page-header">
+    <div class="page-header">
       <h4><i class="bi bi-file-text me-2"></i>Issue Court Order</h4>
     </div>
     <div class="p-4">
@@ -16,7 +16,7 @@
                     <option *ngFor="let c of cases" [value]="c.caseId">#{{ c.caseId }} – {{ c.title }}</option>
                   </select>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3" *ngIf="auth.role !== 'JUDGE'">
                   <label class="form-label">Judge <span class="text-danger">*</span></label>
                   <select class="form-select" [(ngModel)]="form.judgeId" name="judgeId" required>
                     <option [value]="0">Select judge...</option>

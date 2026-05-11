@@ -3,9 +3,14 @@
         <h4><i class="bi bi-folder2-open me-2"></i>Case Details</h4>
         <small class="text-muted">Case #{{ caseId }}</small>
       </div>
-      <a routerLink="/cases" class="btn btn-outline-secondary btn-sm">
-        <i class="bi bi-arrow-left me-1"></i>Back to Cases
-      </a>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-success btn-sm" (click)="downloadCasePDF()">
+          <i class="bi bi-download me-1"></i>Download PDF
+        </button>
+        <a routerLink="/cases" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-arrow-left me-1"></i>Back to Cases
+        </a>
+      </div>
     </div>
 
     <div *ngIf="loading" class="text-center py-5">
@@ -493,11 +498,11 @@
       <!-- Judgments -->
       <div class="card mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <span><i class="bi bi-hammer me-2"></i>Judgments & Court Orders
+          <span><i class="bi bi-hammer me-2"></i>Judgments
             <span class="badge bg-secondary ms-1">{{ judgments.length }}</span>
           </span>
           <a *ngIf="isJudge || isAdmin" [routerLink]="['/judgments/new']"
-             [queryParams]="{caseId: caseId}" class="btn btn-sm btn-outline-warning">
+             [queryParams]="{caseId: caseId}" class="btn btn-sm btn-outline-warning shadow-sm">
             <i class="bi bi-plus me-1"></i>Record Judgment
           </a>
         </div>
@@ -525,6 +530,39 @@
               <tr *ngIf="judgments.length === 0">
                 <td [attr.colspan]="(isJudge || isAdmin) ? 5 : 4" class="text-center text-muted py-3">
                   <i class="bi bi-hammer me-2"></i>No judgments recorded yet
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Court Orders -->
+      <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-file-text me-2"></i>Court Orders
+            <span class="badge bg-secondary ms-1">{{ orders.length }}</span>
+          </span>
+          <a *ngIf="isJudge || isAdmin" [routerLink]="['/judgments/orders/new']"
+             [queryParams]="{caseId: caseId}" class="btn btn-sm btn-outline-info shadow-sm">
+            <i class="bi bi-plus me-1"></i>Issue Order
+          </a>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+              <tr><th>#</th><th>Description</th><th>Date</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let o of orders">
+                <td>#{{ o.orderId }}</td>
+                <td class="text-truncate" style="max-width:220px">{{ o.description }}</td>
+                <td>{{ o.date | date:'mediumDate' }}</td>
+                <td><span class="badge bg-info text-dark">{{ o.status }}</span></td>
+              </tr>
+              <tr *ngIf="orders.length === 0">
+                <td colspan="4" class="text-center text-muted py-3">
+                  <i class="bi bi-file-text me-2"></i>No court orders issued yet
                 </td>
               </tr>
             </tbody>

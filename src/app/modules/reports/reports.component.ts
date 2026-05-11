@@ -288,16 +288,6 @@ import { catchError } from 'rxjs/operators';
             </p>
           </div>
         </div>
-
-        <!-- Raw JSON (Commented Out) -->
-        <!-- 
-        <div class="card mt-4">
-          <div class="card-header fw-semibold">Raw JSON Data</div>
-          <div class="card-body">
-            <pre class="p-2" style="background:#f5f5f5;border-radius:4px;font-size:0.8rem;max-height:300px;overflow-y:auto"><code>{{ selectedReport.metrics }}</code></pre>
-          </div>
-        </div>
-        -->
       </div>
     </div>
   `
