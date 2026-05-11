@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { JudgmentApiService, CaseApiService, UserApiService } from '../../core/services/api.service';
 import { JudgmentResponse, CourtOrderResponse, CaseResponse, UserResponse } from '../../shared/models/models';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-judgments-list',
@@ -14,14 +15,14 @@ import { forkJoin } from 'rxjs';
     <div class="page-header d-flex justify-content-between align-items-center">
       <h4><i class="bi bi-hammer me-2"></i>Judgments & Court Orders</h4>
       <div class="d-flex gap-2">
-        <a routerLink="/judgments/orders/new" class="btn btn-outline-primary"><i class="bi bi-file-text me-1"></i>Issue Order</a>
-        <a routerLink="/judgments/new" class="btn btn-primary"><i class="bi bi-plus me-1"></i>Record Judgment</a>
+        <a *ngIf="!isAuditorOrCompliance" routerLink="/judgments/orders/new" class="btn btn-outline-primary"><i class="bi bi-file-text me-1"></i>Issue Order</a>
+        <a *ngIf="!isAuditorOrCompliance" routerLink="/judgments/new" class="btn btn-primary"><i class="bi bi-plus me-1"></i>Record Judgment</a>
       </div>
     </div>
     <div class="p-4">
       <ul class="nav nav-tabs mb-3">
-        <li class="nav-item"><a class="nav-link" [class.active]="tab==='judgments'" (click)="tab='judgments'">Judgments</a></li>
-        <li class="nav-item"><a class="nav-link" [class.active]="tab==='orders'" (click)="tab='orders';loadOrders()">Court Orders</a></li>
+        <li class="nav-item"><a class="nav-link" [ngClass]="{'active': tab==='judgments'}" (click)="tab='judgments'" style="cursor:pointer">Judgments</a></li>
+        <li class="nav-item"><a class="nav-link" [ngClass]="{'active': tab==='orders'}" (click)="tab='orders';loadOrders()" style="cursor:pointer">Court Orders</a></li>
       </ul>
 
       <!-- Judgments tab -->
@@ -414,21 +415,29 @@ export class JudgmentsListComponent implements OnInit {
   selectedJudgment: JudgmentResponse | null = null;
   selectedOrder: CourtOrderResponse | null = null;
 
-  constructor(private api: JudgmentApiService, private caseApi: CaseApiService, private userApi: UserApiService) {}
+  constructor(private api: JudgmentApiService, private caseApi: CaseApiService, private userApi: UserApiService, private router: Router, public auth: AuthService) {}
+
+  get isAuditorOrCompliance(): boolean { return this.auth.hasRole('AUDITOR') || this.auth.hasRole('COMPLIANCE'); }
 
   ngOnInit(): void {
     forkJoin({
       cases: this.caseApi.getAll(),
       judges: this.userApi.getByRole('JUDGE'),
-      judgments: this.api.getAll()
+      judgments: this.api.getAll(),
+      orders: this.api.getAllOrders()
     }).subscribe({
-      next: ({ cases, judges, judgments }) => {
+      next: ({ cases, judges, judgments, orders }) => {
         this.cases = cases;
         this.judges = judges;
         this.judgments = judgments.map(j => ({
           ...j,
-          caseTitle: cases.find(c => c.caseId === j.caseId)?.title || 'Unknown',
-          judgeName: judges.find(u => u.userId === j.judgeId)?.name || 'Unknown'
+          caseTitle: j.caseTitle || cases.find(c => c.caseId === j.caseId)?.title || 'Unknown',
+          judgeName: j.judgeName || judges.find(u => u.userId === j.judgeId)?.name || 'Unknown'
+        }));
+        this.orders = orders.map(o => ({
+          ...o,
+          caseTitle: o.caseTitle || cases.find(c => c.caseId === o.caseId)?.title || 'Unknown',
+          judgeName: o.judgeName || judges.find(u => u.userId === o.judgeId)?.name || 'Unknown'
         }));
         this.loading = false;
       },
@@ -443,8 +452,8 @@ export class JudgmentsListComponent implements OnInit {
       next: orders => { 
         this.orders = orders.map(o => ({
           ...o,
-          caseTitle: this.cases.find(c => c.caseId === o.caseId)?.title || 'Unknown',
-          judgeName: this.judges.find(u => u.userId === o.judgeId)?.name || 'Unknown'
+          caseTitle: o.caseTitle || this.cases.find(c => c.caseId === o.caseId)?.title || 'Unknown',
+          judgeName: o.judgeName || this.judges.find(u => u.userId === o.judgeId)?.name || 'Unknown'
         }));
         this.ordersLoading = false; 
       }, 

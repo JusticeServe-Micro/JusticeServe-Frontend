@@ -30,7 +30,7 @@ import { AuthService } from '../../core/services/auth.service';
               <div class="mb-2"><small class="text-muted">Date & Time</small><br><strong>{{ hearing.date | date:'longDate' }} at {{ hearing.time }}</strong></div>
             </div>
             <!-- Status Update - Only for Clerk/Admin/Judge -->
-            <div *ngIf="!isLawyer" class="card-footer">
+            <div *ngIf="!isLawyer && !isAuditorOrCompliance" class="card-footer">
               <label class="form-label mb-1">Update Status</label>
               <div class="d-flex gap-2">
                 <select class="form-select form-select-sm" [(ngModel)]="newStatus">
@@ -84,7 +84,7 @@ import { AuthService } from '../../core/services/auth.service';
       </div>
 
       <!-- Proceedings - Only for Clerk/Admin/Judge -->
-      <div *ngIf="!isLawyer" class="row g-3 mt-3">
+      <div *ngIf="!isLawyer && !isAuditorOrCompliance" class="row g-3 mt-3">
         <div class="col-12">
           <div class="card">
             <div class="card-header d-flex justify-content-between">
@@ -134,6 +134,7 @@ export class HearingDetailComponent implements OnInit {
   constructor(private route: ActivatedRoute, private api: HearingApiService, private caseApi: CaseApiService, private auth: AuthService) {}
 
   get isLawyer(): boolean { return this.auth.hasRole('LAWYER'); }
+  get isAuditorOrCompliance(): boolean { return this.auth.hasRole('AUDITOR') || this.auth.hasRole('COMPLIANCE'); }
 
   ngOnInit(): void {
     const id = +this.route.snapshot.params['id'];

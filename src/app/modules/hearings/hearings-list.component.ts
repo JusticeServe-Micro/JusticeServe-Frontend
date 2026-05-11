@@ -13,7 +13,7 @@ import { AuthService } from '../../core/services/auth.service';
   template: `
     <div class="page-header d-flex justify-content-between align-items-center">
       <h4><i class="bi bi-calendar-event me-2"></i>Hearings</h4>
-      <a *ngIf="!isLawyer" routerLink="/hearings/new" class="btn btn-primary"><i class="bi bi-calendar-plus me-1"></i>Schedule Hearing</a>
+      <a *ngIf="!isLawyer && !isAuditorOrCompliance" routerLink="/hearings/new" class="btn btn-primary"><i class="bi bi-calendar-plus me-1"></i>Schedule Hearing</a>
     </div>
     <div class="p-4">
       <div class="card mb-3">
@@ -68,6 +68,7 @@ export class HearingsListComponent implements OnInit {
   constructor(private api: HearingApiService, private caseApi: CaseApiService, private auth: AuthService) {}
 
   get isLawyer(): boolean { return this.auth.hasRole('LAWYER'); }
+  get isAuditorOrCompliance(): boolean { return this.auth.hasRole('AUDITOR') || this.auth.hasRole('COMPLIANCE'); }
 
   get filtered(): HearingResponse[] {
     return this.hearings.filter(h =>

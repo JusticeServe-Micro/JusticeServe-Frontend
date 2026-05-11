@@ -119,10 +119,7 @@ import { AuthService } from '../../core/services/auth.service';
                   <td>{{ a.date | date:'mediumDate' }}</td>
                   <td><span class="badge" [ngClass]="auditBadge(a.status)">{{ a.status }}</span></td>
                   <td>
-                    <select class="form-select form-select-sm" style="width:110px" [ngModel]="a.status"
-                            (change)="updateAuditStatus(a.auditId, $any($event.target).value)">
-                      <option>OPEN</option><option>REVIEW</option><option>CLOSED</option>
-                    </select>
+                    <span class="badge" [ngClass]="auditBadge(a.status)">{{ a.status }}</span>
                   </td>
                 </tr>
                 <tr *ngIf="audits.length===0"><td colspan="7" class="text-center text-muted py-3">No audits</td></tr>

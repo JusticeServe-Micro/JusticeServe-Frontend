@@ -330,15 +330,16 @@ import { AuthService } from '../../core/services/auth.service';
       <!-- ══ COMPLIANCE / AUDITOR DASHBOARD ══ -->
       <ng-container *ngIf="isCompliance || isAuditor">
         <div class="row g-3 mb-4">
-          <div class="col-sm-6 col-md-4">
+          <div class="col-sm-6 col-md-3">
             <div class="stat-card" style="background:linear-gradient(135deg,#667eea,#764ba2)">
               <div class="d-flex justify-content-between align-items-center">
                 <div><div style="font-size:0.8rem;opacity:0.8">Total Cases</div><div style="font-size:2rem;font-weight:700">{{ stats.totalCases }}</div></div>
                 <i class="bi bi-folder2-open" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/cases" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View cases →</a>
             </div>
           </div>
-          <div class="col-sm-6 col-md-4">
+          <div class="col-sm-6 col-md-3">
             <div class="stat-card" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">
               <div class="d-flex justify-content-between align-items-center">
                 <div><div style="font-size:0.8rem;opacity:0.8">Total Hearings</div><div style="font-size:2rem;font-weight:700">{{ stats.totalHearings }}</div></div>
@@ -347,13 +348,22 @@ import { AuthService } from '../../core/services/auth.service';
               <a routerLink="/hearings" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View hearings →</a>
             </div>
           </div>
-          <div class="col-sm-6 col-md-4">
+          <div class="col-sm-6 col-md-3">
             <div class="stat-card" style="background:linear-gradient(135deg,#f093fb,#f5576c)">
               <div class="d-flex justify-content-between align-items-center">
-                <div><div style="font-size:0.8rem;opacity:0.8">Judgments</div><div style="font-size:2rem;font-weight:700">{{ stats.finalizedJudgments }}</div></div>
+                <div><div style="font-size:0.8rem;opacity:0.8">Total Judgments</div><div style="font-size:2rem;font-weight:700">{{ stats.totalJudgments }}</div></div>
                 <i class="bi bi-hammer" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
               <a routerLink="/judgments" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View judgments →</a>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-3">
+            <div class="stat-card" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">
+              <div class="d-flex justify-content-between align-items-center">
+                <div><div style="font-size:0.8rem;opacity:0.8">Court Orders</div><div style="font-size:2rem;font-weight:700">{{ stats.totalOrders }}</div></div>
+                <i class="bi bi-file-text" style="font-size:2.5rem;opacity:0.5"></i>
+              </div>
+              <a routerLink="/judgments" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View orders →</a>
             </div>
           </div>
         </div>
@@ -576,15 +586,18 @@ export class DashboardComponent implements OnInit {
         cases: this.caseApi.getAll().pipe(catchError(() => of([]))),
         hearings: this.hearingApi.getAll().pipe(catchError(() => of([]))),
         citizens: this.citizenApi.getAll().pipe(catchError(() => of([]))),
-        judgments: this.judgmentApi.getAll().pipe(catchError(() => of([])))
-      }).subscribe(({ cases, hearings, citizens, judgments }) => {
+        judgments: this.judgmentApi.getAll().pipe(catchError(() => of([]))),
+        orders: this.judgmentApi.getAllOrders().pipe(catchError(() => of([])))
+      }).subscribe(({ cases, hearings, citizens, judgments, orders }) => {
         this.stats.totalCases = cases.length;
         this.stats.activeCases = (cases as any[]).filter((c: any) => c.status === 'ACTIVE').length;
         this.stats.underReview = (cases as any[]).filter((c: any) => c.status === 'UNDER_REVIEW').length;
         this.stats.totalHearings = hearings.length;
         this.stats.scheduledHearings = (hearings as any[]).filter((h: any) => h.status === 'SCHEDULED').length;
         this.stats.totalCitizens = citizens.length;
+        this.stats.totalJudgments = judgments.length;
         this.stats.finalizedJudgments = (judgments as any[]).filter((j: any) => j.status === 'FINAL').length;
+        this.stats.totalOrders = orders.length;
         this.recentCases = cases as any[];
         this.recentHearings = (hearings as any[]).slice(-5).reverse();
         this.loading = false;
