@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { HearingApiService, CaseApiService } from '../../core/services/api.service';
+import { HearingApiService, CaseApiService, CitizenApiService } from '../../core/services/api.service';
 import { HearingResponse, CaseResponse } from '../../shared/models/models';
 import { AuthService } from '../../core/services/auth.service';
 
@@ -13,7 +13,7 @@ import { AuthService } from '../../core/services/auth.service';
   template: `
     <div class="page-header d-flex justify-content-between align-items-center">
       <h4><i class="bi bi-calendar-event me-2"></i>Hearings</h4>
-      <a *ngIf="!isLawyer && !isAuditorOrCompliance" routerLink="/hearings/new" class="btn btn-primary"><i class="bi bi-calendar-plus me-1"></i>Schedule Hearing</a>
+      <a *ngIf="!isLawyer && !isAuditorOrCompliance && !isCitizen" routerLink="/hearings/new" class="btn btn-primary"><i class="bi bi-calendar-plus me-1"></i>Schedule Hearing</a>
     </div>
     <div class="p-4">
       <div class="card mb-3">
@@ -65,8 +65,9 @@ export class HearingsListComponent implements OnInit {
   filterStatus = '';
   statuses = ['SCHEDULED','IN_PROGRESS','COMPLETED','ADJOURNED','CANCELLED'];
 
-  constructor(private api: HearingApiService, private caseApi: CaseApiService, private auth: AuthService) {}
+  constructor(private api: HearingApiService, private caseApi: CaseApiService, private citizenApi: CitizenApiService, private auth: AuthService) {}
 
+  get isCitizen(): boolean { return this.auth.hasRole('CITIZEN'); }
   get isLawyer(): boolean { return this.auth.hasRole('LAWYER'); }
   get isAuditorOrCompliance(): boolean { return this.auth.hasRole('AUDITOR') || this.auth.hasRole('COMPLIANCE'); }
   get isJudge(): boolean { return this.auth.hasRole('JUDGE'); }
@@ -113,7 +114,6 @@ export class HearingsListComponent implements OnInit {
         error: () => this.loading = false
       });
     } else if (this.isJudge) {
-      // For judges, fetch all hearings and filter on frontend
       const userId = this.auth.currentUser?.userId;
       if (!userId) { this.loading = false; return; }
       this.api.getAll().subscribe({
@@ -122,6 +122,42 @@ export class HearingsListComponent implements OnInit {
           this.loading = false;
         },
         error: () => this.loading = false
+      });
+    } else if (this.isCitizen) {
+      const userId = this.auth.currentUser?.userId;
+      if (!userId) { this.loading = false; return; }
+
+      this.citizenApi.getByUserId(userId).subscribe({
+        next: citizen => {
+          this.caseApi.getByCitizen(citizen.citizenId).subscribe({
+            next: cases => {
+              if (cases.length === 0) { this.hearings = []; this.loading = false; return; }
+              const allHearings: HearingResponse[] = [];
+              let pending = cases.length;
+              cases.forEach(c => {
+                this.api.getByCase(c.caseId).subscribe({
+                  next: caseHearings => {
+                    allHearings.push(...caseHearings);
+                    pending -= 1;
+                    if (pending === 0) {
+                      this.hearings = allHearings;
+                      this.loading = false;
+                    }
+                  },
+                  error: () => {
+                    pending -= 1;
+                    if (pending === 0) {
+                      this.hearings = allHearings;
+                      this.loading = false;
+                    }
+                  }
+                });
+              });
+            },
+            error: () => { this.hearings = []; this.loading = false; }
+          });
+        },
+        error: () => { this.hearings = []; this.loading = false; }
       });
     } else {
       this.api.getAll().subscribe({ next: d => { this.hearings = d; this.loading = false; }, error: () => this.loading = false });

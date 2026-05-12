@@ -1,4 +1,4 @@
-    <div class="page-header d-flex align-items-center justify-content-between">
+<div class="page-header d-flex align-items-center justify-content-between">
       <div>
         <h4><i class="bi bi-grid me-2"></i>Dashboard</h4>
         <p class="text-muted mb-0" style="font-size:0.85rem">
@@ -195,7 +195,7 @@
                 <div><div style="font-size:0.8rem;opacity:0.8">Citizens</div><div style="font-size:2rem;font-weight:700">{{ stats.totalCitizens }}</div></div>
                 <i class="bi bi-people" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
-              <a routerLink="/judgments/orders" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View orders →</a>
+              <a routerLink="/citizens" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View citizens →</a>
             </div>
           </div>
           <div class="col-sm-6 col-md-3">
@@ -317,15 +317,16 @@
       <!-- ══ COMPLIANCE / AUDITOR DASHBOARD ══ -->
       <ng-container *ngIf="isCompliance || isAuditor">
         <div class="row g-3 mb-4">
-          <div class="col-sm-6 col-md-4">
+          <div class="col-sm-6 col-md-3">
             <div class="stat-card" style="background:linear-gradient(135deg,#667eea,#764ba2)">
               <div class="d-flex justify-content-between align-items-center">
                 <div><div style="font-size:0.8rem;opacity:0.8">Total Cases</div><div style="font-size:2rem;font-weight:700">{{ stats.totalCases }}</div></div>
                 <i class="bi bi-folder2-open" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
+              <a routerLink="/cases" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View cases →</a>
             </div>
           </div>
-          <div class="col-sm-6 col-md-4">
+          <div class="col-sm-6 col-md-3">
             <div class="stat-card" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">
               <div class="d-flex justify-content-between align-items-center">
                 <div><div style="font-size:0.8rem;opacity:0.8">Total Hearings</div><div style="font-size:2rem;font-weight:700">{{ stats.totalHearings }}</div></div>
@@ -334,13 +335,22 @@
               <a routerLink="/hearings" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View hearings →</a>
             </div>
           </div>
-          <div class="col-sm-6 col-md-4">
+          <div class="col-sm-6 col-md-3">
             <div class="stat-card" style="background:linear-gradient(135deg,#f093fb,#f5576c)">
               <div class="d-flex justify-content-between align-items-center">
-                <div><div style="font-size:0.8rem;opacity:0.8">Judgments</div><div style="font-size:2rem;font-weight:700">{{ stats.finalizedJudgments }}</div></div>
+                <div><div style="font-size:0.8rem;opacity:0.8">Total Judgments</div><div style="font-size:2rem;font-weight:700">{{ stats.totalJudgments }}</div></div>
                 <i class="bi bi-hammer" style="font-size:2.5rem;opacity:0.5"></i>
               </div>
               <a routerLink="/judgments" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View judgments →</a>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-3">
+            <div class="stat-card" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">
+              <div class="d-flex justify-content-between align-items-center">
+                <div><div style="font-size:0.8rem;opacity:0.8">Court Orders</div><div style="font-size:2rem;font-weight:700">{{ stats.totalOrders }}</div></div>
+                <i class="bi bi-file-text" style="font-size:2.5rem;opacity:0.5"></i>
+              </div>
+              <a routerLink="/judgments" class="text-white-50 text-decoration-none" style="font-size:0.8rem">View orders →</a>
             </div>
           </div>
         </div>

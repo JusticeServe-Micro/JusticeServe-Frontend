@@ -26,12 +26,46 @@ body {
 }
 
 .sidebar .brand {
-  padding: 1.2rem 1.5rem;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--js-accent);
-  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.92);
+  letter-spacing: 0.35px;
+  text-transform: none;
+}
+
+.sidebar .brand img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  border-radius: 0.5rem;
+}
+
+.sidebar .brand-text-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar .brand-icon {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.85);
+}
+
+.sidebar .brand-title {
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sidebar .brand i {
+  font-size: 1.15rem;
+  opacity: 0.9;
 }
 
 .sidebar .nav-link {
