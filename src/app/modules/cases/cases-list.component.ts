@@ -32,6 +32,7 @@ export class CasesListComponent implements OnInit {
   get isLawyer() { return this.auth.hasRole('LAWYER'); }
   get isClerk() { return this.auth.hasRole('CLERK'); }
   get isAdmin() { return this.auth.hasRole('ADMIN'); }
+  get isJudge() { return this.auth.hasRole('JUDGE'); }
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(params => {
@@ -75,8 +76,18 @@ export class CasesListComponent implements OnInit {
           });
         }
       });
+    } else if (this.isJudge) {
+      // Judge: only cases assigned to them
+      this.api.getAll().subscribe({
+        next: all => {
+          this.cases = all.filter(c => c.judgeId === userId);
+          this.applyFilter();
+          this.loading = false;
+        },
+        error: () => this.loading = false
+      });
     } else {
-      // Clerk, Admin, Judge, Compliance: see all cases
+      // Clerk, Admin, Compliance: see all cases
       this.api.getAll().subscribe({
         next: d => { this.cases = d; this.applyFilter(); this.loading = false; },
         error: () => this.loading = false

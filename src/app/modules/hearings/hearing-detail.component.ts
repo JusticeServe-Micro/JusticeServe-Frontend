@@ -10,27 +10,111 @@ import { AuthService } from '../../core/services/auth.service';
   selector: 'app-hearing-detail',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
+  styles: [`
+    .hearing-detail-page {
+      padding-bottom: 2rem;
+    }
+    .hearing-detail-page .page-header {
+      margin-bottom: 1.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    }
+    .hearing-detail-page .card {
+      border: none;
+      border-radius: 1.15rem;
+      overflow: hidden;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+    }
+    .hearing-detail-page .card-header {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      color: #0f172a;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 1.25rem 1.5rem;
+    }
+    .hearing-detail-page .card-body {
+      padding: 1.5rem;
+    }
+    .hearing-detail-page .card-footer {
+      background: #fff;
+      border-top: 1px solid rgba(15, 23, 42, 0.08);
+      padding: 1.25rem 1.5rem;
+    }
+    .hearing-detail-page .detail-meta {
+      background: #f8fafc;
+      border-radius: 1rem;
+      padding: 1.25rem;
+    }
+    .hearing-detail-page .meta-label {
+      color: #64748b;
+      display: block;
+      font-size: 0.72rem;
+      margin-bottom: 0.45rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .hearing-detail-page .detail-value {
+      color: #0f172a;
+      font-weight: 600;
+      display: block;
+      font-size: 0.95rem;
+    }
+    .hearing-detail-page .status-pill {
+      min-width: 130px;
+      text-align: center;
+      padding: 0.55rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+    }
+    .hearing-detail-page .btn-outline-secondary {
+      border-color: rgba(15, 23, 42, 0.14);
+    }
+    .hearing-detail-page .detail-card + .detail-card {
+      margin-top: 1rem;
+    }
+    @media (max-width: 991px) {
+      .hearing-detail-page .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+      .hearing-detail-page .row.g-3 {
+        flex-direction: column;
+      }
+    }
+  `],
   template: `
     <div class="page-header d-flex justify-content-between align-items-center">
       <h4><i class="bi bi-calendar-event me-2"></i>Hearing Details</h4>
       <a routerLink="/hearings" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back</a>
     </div>
-    <div class="p-4" *ngIf="!loading && hearing">
+    <div class="p-4 hearing-detail-page" *ngIf="!loading && hearing">
       <div class="row g-3">
         <!-- Hearing Info -->
         <div class="col-lg-5">
-          <div class="card">
-            <div class="card-header d-flex justify-content-between">
-              <span>Hearing #{{ hearing.hearingId }}</span>
-              <span class="badge" [ngClass]="badge(hearing.status)">{{ hearing.status }}</span>
+          <div class="card detail-card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span class="text-uppercase" style="font-size:0.92rem;">Hearing #{{ hearing.hearingId }}</span>
+              <span class="badge status-pill" [ngClass]="badge(hearing.status)">{{ hearing.status }}</span>
             </div>
-            <div class="card-body">
-              <div class="mb-2"><small class="text-muted">Case</small><br><strong>{{ hearing.caseTitle }}</strong></div>
-              <div class="mb-2"><small class="text-muted">Judge</small><br><strong>{{ hearing.judgeName }}</strong></div>
-              <div class="mb-2"><small class="text-muted">Date & Time</small><br><strong>{{ hearing.date | date:'longDate' }} at {{ hearing.time }}</strong></div>
+            <div class="card-body detail-meta">
+              <div class="mb-4">
+                <small class="meta-label">Case</small>
+                <span class="detail-value">{{ hearing.caseTitle }}</span>
+              </div>
+              <div class="mb-4">
+                <small class="meta-label">Judge</small>
+                <span class="detail-value">{{ hearing.judgeName }}</span>
+              </div>
+              <div>
+                <small class="meta-label">Date & Time</small>
+                <span class="detail-value">{{ hearing.date | date:'longDate' }} at {{ hearing.time }}</span>
+              </div>
             </div>
             <!-- Status Update - Only for Clerk/Admin/Judge -->
-            <div *ngIf="!isLawyer && !isAuditorOrCompliance" class="card-footer">
+            <div *ngIf="showHearingControls" class="card-footer">
               <label class="form-label mb-1">Update Status</label>
               <div class="d-flex gap-2">
                 <select class="form-select form-select-sm" [(ngModel)]="newStatus">
@@ -45,37 +129,41 @@ import { AuthService } from '../../core/services/auth.service';
 
         <!-- Case Details -->
         <div class="col-lg-7">
-          <div class="card">
+          <div class="card detail-card mb-3">
             <div class="card-header"><i class="bi bi-folder me-2"></i>Case Information</div>
-            <div class="card-body" *ngIf="caseData">
-              <div class="row g-3">
+            <div class="card-body detail-meta" *ngIf="caseData">
+              <div class="row g-3 meta-row">
                 <div class="col-sm-6">
-                  <small class="text-muted d-block mb-1"><strong>Case ID</strong></small>
-                  <span>#{{ caseData.caseId }}</span>
+                  <small class="meta-label"><strong>Case ID</strong></small>
+                  <span class="detail-value">#{{ caseData.caseId }}</span>
                 </div>
                 <div class="col-sm-6">
-                  <small class="text-muted d-block mb-1"><strong>Title</strong></small>
-                  <span>{{ caseData.title }}</span>
+                  <small class="meta-label"><strong>Title</strong></small>
+                  <span class="detail-value">{{ caseData.title }}</span>
                 </div>
                 <div class="col-12">
-                  <small class="text-muted d-block mb-1"><strong>Description</strong></small>
-                  <p class="mb-0">{{ caseData.description || 'No description' }}</p>
+                  <small class="meta-label"><strong>Description</strong></small>
+                  <p class="mb-0 detail-value">{{ caseData.description || 'No description' }}</p>
                 </div>
                 <div class="col-sm-6">
-                  <small class="text-muted d-block mb-1"><strong>Citizen</strong></small>
-                  <span>{{ caseData.citizenName }}</span>
+                  <small class="meta-label"><strong>Citizen</strong></small>
+                  <span class="detail-value">{{ caseData.citizenName }}</span>
                 </div>
                 <div class="col-sm-6">
-                  <small class="text-muted d-block mb-1"><strong>Filed Date</strong></small>
-                  <span>{{ caseData.filedDate | date:'mediumDate' }}</span>
+                  <small class="meta-label"><strong>Lawyer</strong></small>
+                  <span class="detail-value">{{ caseData.lawyerName || 'Not assigned' }}</span>
                 </div>
                 <div class="col-sm-6">
-                  <small class="text-muted d-block mb-1"><strong>Status</strong></small>
-                  <span class="badge" [ngClass]="caseStatusBadge(caseData.status)">{{ caseData.status }}</span>
+                  <small class="meta-label"><strong>Filed Date</strong></small>
+                  <span class="detail-value">{{ caseData.filedDate | date:'mediumDate' }}</span>
                 </div>
                 <div class="col-sm-6">
-                  <small class="text-muted d-block mb-1"><strong>Judge</strong></small>
-                  <span>{{ caseData.judgeName || 'Not assigned' }}</span>
+                  <small class="meta-label"><strong>Status</strong></small>
+                  <span class="badge status-pill" [ngClass]="caseStatusBadge(caseData.status)">{{ caseData.status }}</span>
+                </div>
+                <div class="col-sm-6">
+                  <small class="meta-label"><strong>Judge</strong></small>
+                  <span class="detail-value">{{ caseData.judgeName || 'Not assigned' }}</span>
                 </div>
               </div>
             </div>
@@ -84,7 +172,7 @@ import { AuthService } from '../../core/services/auth.service';
       </div>
 
       <!-- Proceedings - Only for Clerk/Admin/Judge -->
-      <div *ngIf="!isLawyer && !isAuditorOrCompliance" class="row g-3 mt-3">
+      <div *ngIf="showHearingControls" class="row g-3 mt-3">
         <div class="col-12">
           <div class="card">
             <div class="card-header d-flex justify-content-between">
@@ -133,8 +221,12 @@ export class HearingDetailComponent implements OnInit {
 
   constructor(private route: ActivatedRoute, private api: HearingApiService, private caseApi: CaseApiService, private auth: AuthService) {}
 
+  get isCitizen(): boolean { return this.auth.hasRole('CITIZEN'); }
   get isLawyer(): boolean { return this.auth.hasRole('LAWYER'); }
   get isAuditorOrCompliance(): boolean { return this.auth.hasRole('AUDITOR') || this.auth.hasRole('COMPLIANCE'); }
+  get showHearingControls(): boolean {
+    return this.auth.hasRole('JUDGE') || this.auth.hasRole('CLERK') || this.auth.hasRole('ADMIN');
+  }
 
   ngOnInit(): void {
     const id = +this.route.snapshot.params['id'];

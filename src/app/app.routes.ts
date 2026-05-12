@@ -35,9 +35,7 @@ export const routes: Routes = [
         loadChildren: () => import('./modules/cases/cases.routes').then(m => m.casesRoutes)
       },
       {
-        // CITIZEN cannot access hearings list
         path: 'hearings',
-        canActivate: [notCitizenGuard],
         loadChildren: () => import('./modules/hearings/hearings.routes').then(m => m.hearingsRoutes)
       },
       {
