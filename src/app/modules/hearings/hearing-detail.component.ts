@@ -230,6 +230,13 @@ export class HearingDetailComponent implements OnInit {
 
   ngOnInit(): void {
     const id = +this.route.snapshot.params['id'];
+    
+    // Validate that id is a valid number
+    if (!id || isNaN(id) || id <= 0) {
+      this.loading = false;
+      return;
+    }
+    
     this.api.getById(id).subscribe(h => { 
       this.hearing = h; 
       this.newStatus = h.status;

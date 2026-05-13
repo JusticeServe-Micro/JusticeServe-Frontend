@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { catchError, of, take } from 'rxjs';
 import { NotificationApiService } from '../../core/services/api.service';
 import { NotificationResponse } from '../../shared/models/models';
 import { AuthService } from '../../core/services/auth.service';

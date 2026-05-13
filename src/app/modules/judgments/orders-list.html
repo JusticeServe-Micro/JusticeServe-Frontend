@@ -1,0 +1,117 @@
+<div class="page-header d-flex justify-content-between align-items-center">
+      <h4><i class="bi bi-file-text me-2"></i> Court Orders</h4>
+      <div class="d-flex gap-2">
+        <a *ngIf="!isAuditorOrCompliance" routerLink="/judgments/orders/new" class="btn btn-outline-primary">
+          <i class="bi bi-plus me-1"></i> Issue Order
+        </a>
+      </div>
+    </div>
+
+    <div class="p-4">
+      <div class="card">
+        <div class="card-body p-0">
+          <div *ngIf="loading" class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-2 text-muted">Loading court orders...</p>
+          </div>
+          <div class="table-responsive" *ngIf="!loading">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Case</th>
+                  <th>Judge</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let order of orders">
+                  <td>#{{ order.orderId }}</td>
+                  <td>{{ order.caseTitle }}</td>
+                  <td>{{ order.judgeName }}</td>
+                  <td>{{ order.description | slice:0:50 }}...</td>
+                  <td>{{ order.date | date:'mediumDate' }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="order.status === 'ACTIVE' ? 'bg-success' : order.status === 'SERVED' ? 'bg-info' : 'bg-secondary'">
+                      {{ order.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-info" (click)="viewOrder(order)">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="orders.length === 0">
+                  <td colspan="7" class="text-center text-muted py-4">No court orders</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" [class.show]="selectedOrder" [style.display]="selectedOrder ? 'block' : 'none'" tabindex="-1">
+      <div class="modal-dialog modal-lg judgment-modal">
+        <div class="modal-content judgment-content">
+          <div class="modal-header judgment-header">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-file-text" style="font-size: 1.5rem; color: #667eea;"></i>
+              <div>
+                <h5 class="modal-title mb-0">Court Order Details</h5>
+                <small class="text-muted">Order #{{ selectedOrder?.orderId }}</small>
+              </div>
+            </div>
+            <button type="button" class="btn-close" (click)="closeModal()"></button>
+          </div>
+          <div class="modal-body judgment-body" *ngIf="selectedOrder">
+            <div class="mb-4 pb-3 border-bottom">
+              <span class="badge p-2 fs-6" [ngClass]="selectedOrder.status === 'ACTIVE' ? 'bg-success' : selectedOrder.status === 'SERVED' ? 'bg-info' : 'bg-secondary'">
+                <i class="bi me-2" [ngClass]="selectedOrder.status === 'ACTIVE' ? 'bi-check-circle' : selectedOrder.status === 'SERVED' ? 'bi-check-circle' : 'bi-file-earmark-text'"></i>
+                {{ selectedOrder.status }}
+              </span>
+            </div>
+            <div class="row g-4 mb-4">
+              <div class="col-md-6">
+                <div class="info-card">
+                  <div class="info-label">Order ID</div>
+                  <div class="info-value">#{{ selectedOrder.orderId }}</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-card">
+                  <div class="info-label">Date Issued</div>
+                  <div class="info-value">{{ selectedOrder.date | date:'mediumDate' }}</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-card">
+                  <div class="info-label">Judge</div>
+                  <div class="info-value">{{ selectedOrder.judgeName }}</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-card">
+                  <div class="info-label">Case</div>
+                  <div class="info-value">{{ selectedOrder.caseTitle }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="summary-section">
+              <div class="summary-title">Description</div>
+              <div class="summary-content">{{ selectedOrder.description }}</div>
+            </div>
+          </div>
+          <div class="judgment-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+            <button type="button" class="btn btn-primary" (click)="downloadOrderPDF(selectedOrder)">
+              <i class="bi bi-download me-1"></i> Download PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>

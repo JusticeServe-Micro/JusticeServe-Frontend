@@ -18,7 +18,6 @@ export const guestGuard: CanActivateFn = () => {
   return false;
 };
 
-/** Restrict pages that citizens cannot access */
 export const notCitizenGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
@@ -27,7 +26,6 @@ export const notCitizenGuard: CanActivateFn = () => {
   return true;
 };
 
-/** Only admin can access */
 export const adminGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);

@@ -1,0 +1,58 @@
+ .judgment-modal {
+        max-width: 800px;
+      }
+      .judgment-content {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+      }
+      .judgment-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 1.5rem;
+      }
+      .judgment-body {
+        padding: 2rem;
+        background: #f8f9fa;
+      }
+      .info-card {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+      }
+      .info-label {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+      .info-value {
+        font-size: 1rem;
+        font-weight: 700;
+      }
+      .summary-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+      }
+      .summary-title {
+        font-weight: 700;
+        margin-bottom: 1rem;
+      }
+      .summary-content {
+        color: #495057;
+        line-height: 1.8;
+      }
+      .judgment-footer {
+        background: white;
+        border-top: 1px solid #e9ecef;
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+      }

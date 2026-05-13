@@ -765,7 +765,6 @@ export class CaseDetailComponent implements OnInit {
     tempDiv.style.left = '-9999px';
     document.body.appendChild(tempDiv);
 
-    // Use html2pdf-like approach with canvas
     const element = tempDiv.querySelector('body') || tempDiv;
     const opt = {
       margin: 10,
