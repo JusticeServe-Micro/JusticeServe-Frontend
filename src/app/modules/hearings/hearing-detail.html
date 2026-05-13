@@ -1,23 +1,32 @@
-   <div class="page-header d-flex justify-content-between align-items-center">
+<div class="page-header d-flex justify-content-between align-items-center">
       <h4><i class="bi bi-calendar-event me-2"></i>Hearing Details</h4>
       <a routerLink="/hearings" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back</a>
     </div>
-    <div class="p-4" *ngIf="!loading && hearing">
+    <div class="p-4 hearing-detail-page" *ngIf="!loading && hearing">
       <div class="row g-3">
         <!-- Hearing Info -->
         <div class="col-lg-5">
-          <div class="card">
-            <div class="card-header d-flex justify-content-between">
-              <span>Hearing #{{ hearing.hearingId }}</span>
-              <span class="badge" [ngClass]="badge(hearing.status)">{{ hearing.status }}</span>
+          <div class="card detail-card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span class="text-uppercase" style="font-size:0.92rem;">Hearing #{{ hearing.hearingId }}</span>
+              <span class="badge status-pill" [ngClass]="badge(hearing.status)">{{ hearing.status }}</span>
             </div>
-            <div class="card-body">
-              <div class="mb-2"><small class="text-muted">Case</small><br><strong>{{ hearing.caseTitle }}</strong></div>
-              <div class="mb-2"><small class="text-muted">Judge</small><br><strong>{{ hearing.judgeName }}</strong></div>
-              <div class="mb-2"><small class="text-muted">Date & Time</small><br><strong>{{ hearing.date | date:'longDate' }} at {{ hearing.time }}</strong></div>
+            <div class="card-body detail-meta">
+              <div class="mb-4">
+                <small class="meta-label">Case</small>
+                <span class="detail-value">{{ hearing.caseTitle }}</span>
+              </div>
+              <div class="mb-4">
+                <small class="meta-label">Judge</small>
+                <span class="detail-value">{{ hearing.judgeName }}</span>
+              </div>
+              <div>
+                <small class="meta-label">Date & Time</small>
+                <span class="detail-value">{{ hearing.date | date:'longDate' }} at {{ hearing.time }}</span>
+              </div>
             </div>
             <!-- Status Update - Only for Clerk/Admin/Judge -->
-            <div *ngIf="!isLawyer" class="card-footer">
+            <div *ngIf="showHearingControls" class="card-footer">
               <label class="form-label mb-1">Update Status</label>
               <div class="d-flex gap-2">
                 <select class="form-select form-select-sm" [(ngModel)]="newStatus">
@@ -32,37 +41,41 @@
 
         <!-- Case Details -->
         <div class="col-lg-7">
-          <div class="card">
+          <div class="card detail-card mb-3">
             <div class="card-header"><i class="bi bi-folder me-2"></i>Case Information</div>
-            <div class="card-body" *ngIf="caseData">
-              <div class="row g-3">
+            <div class="card-body detail-meta" *ngIf="caseData">
+              <div class="row g-3 meta-row">
                 <div class="col-sm-6">
-                  <small class="text-muted d-block mb-1"><strong>Case ID</strong></small>
-                  <span>#{{ caseData.caseId }}</span>
+                  <small class="meta-label"><strong>Case ID</strong></small>
+                  <span class="detail-value">#{{ caseData.caseId }}</span>
                 </div>
                 <div class="col-sm-6">
-                  <small class="text-muted d-block mb-1"><strong>Title</strong></small>
-                  <span>{{ caseData.title }}</span>
+                  <small class="meta-label"><strong>Title</strong></small>
+                  <span class="detail-value">{{ caseData.title }}</span>
                 </div>
                 <div class="col-12">
-                  <small class="text-muted d-block mb-1"><strong>Description</strong></small>
-                  <p class="mb-0">{{ caseData.description || 'No description' }}</p>
+                  <small class="meta-label"><strong>Description</strong></small>
+                  <p class="mb-0 detail-value">{{ caseData.description || 'No description' }}</p>
                 </div>
                 <div class="col-sm-6">
-                  <small class="text-muted d-block mb-1"><strong>Citizen</strong></small>
-                  <span>{{ caseData.citizenName }}</span>
+                  <small class="meta-label"><strong>Citizen</strong></small>
+                  <span class="detail-value">{{ caseData.citizenName }}</span>
                 </div>
                 <div class="col-sm-6">
-                  <small class="text-muted d-block mb-1"><strong>Filed Date</strong></small>
-                  <span>{{ caseData.filedDate | date:'mediumDate' }}</span>
+                  <small class="meta-label"><strong>Lawyer</strong></small>
+                  <span class="detail-value">{{ caseData.lawyerName || 'Not assigned' }}</span>
                 </div>
                 <div class="col-sm-6">
-                  <small class="text-muted d-block mb-1"><strong>Status</strong></small>
-                  <span class="badge" [ngClass]="caseStatusBadge(caseData.status)">{{ caseData.status }}</span>
+                  <small class="meta-label"><strong>Filed Date</strong></small>
+                  <span class="detail-value">{{ caseData.filedDate | date:'mediumDate' }}</span>
                 </div>
                 <div class="col-sm-6">
-                  <small class="text-muted d-block mb-1"><strong>Judge</strong></small>
-                  <span>{{ caseData.judgeName || 'Not assigned' }}</span>
+                  <small class="meta-label"><strong>Status</strong></small>
+                  <span class="badge status-pill" [ngClass]="caseStatusBadge(caseData.status)">{{ caseData.status }}</span>
+                </div>
+                <div class="col-sm-6">
+                  <small class="meta-label"><strong>Judge</strong></small>
+                  <span class="detail-value">{{ caseData.judgeName || 'Not assigned' }}</span>
                 </div>
               </div>
             </div>
@@ -71,7 +84,7 @@
       </div>
 
       <!-- Proceedings - Only for Clerk/Admin/Judge -->
-      <div *ngIf="!isLawyer" class="row g-3 mt-3">
+      <div *ngIf="showHearingControls" class="row g-3 mt-3">
         <div class="col-12">
           <div class="card">
             <div class="card-header d-flex justify-content-between">
@@ -105,3 +118,4 @@
       </div>
     </div>
     <div *ngIf="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+ 
